@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>رفع بلاغ | مَجرى</title>
+<style>
+:root {
+  --bg-deep: #0b0f19;
+  --bg-card: #111827;
+  --bg-card-hover: #161e2f;
+  --border: #374151;
+  --cyan: #06b6d4;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.6;
+  min-width: 100%;
+}
+a { text-decoration: none; color: inherit; }
+
+/* Navbar */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 32px;
+  background: rgba(11,15,25,0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+.nav-logo { font-size: 20px; font-weight: 800; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+.nav-logo span { color: var(--text-primary); }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 13px; color: var(--text-secondary); transition: color .25s; }
+.nav-links a:hover { color: var(--cyan); }
+.nav-links a.active { color: var(--cyan); border-bottom: 2px solid var(--cyan); padding-bottom: 4px; }
+.nav-cta {
+  padding: 8px 20px;
+  background: var(--red); color: var(--bg-deep);
+  border: none; border-radius: 6px;
+  font-size: 12px; font-weight: 700;
+  transition: all .25s;
+}
+.nav-cta:hover { box-shadow: 0 0 16px rgba(239,68,68,0.4); }
+
+/* Layout */
+.report-container {
+  max-width: 760px; margin: 0 auto;
+  padding: 40px 32px;
+}
+
+/* Page header */
+.report-header {
+  text-align: center; margin-bottom: 32px;
+}
+.report-header .header-icon {
+  font-size: 42px; color: var(--red); margin-bottom: 12px;
+}
+.report-header h1 {
+  font-size: 26px; font-weight: 800; margin-bottom: 8px;
+}
+.report-header p {
+  font-size: 13px; color: var(--text-secondary);
+  max-width: 520px; margin: 0 auto;
+  line-height: 1.8;
+}
+
+/* Urgency banner */
+.urgency-bar {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 12px 20px;
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 10px;
+  margin-bottom: 24px;
+}
+.urgency-bar .u-icon { font-size: 18px; color: var(--red); }
+.urgency-bar .u-text { font-size: 12px; color: var(--text-secondary); }
+.urgency-bar .u-text strong { color: var(--red); font-weight: 700; }
+
+/* Form card */
+.form-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px;
+  position: relative; overflow: hidden;
+}
+.form-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--amber), var(--emerald));
+}
+
+/* Severity selector */
+.severity-section { margin-bottom: 28px; }
+.severity-section label {
+  display: block; font-size: 13px; font-weight: 600;
+  color: var(--text-secondary); margin-bottom: 10px;
+}
+.severity-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.severity-opt {
+  padding: 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .25s;
+  background: var(--bg-deep);
+}
+.severity-opt:hover { border-color: var(--text-muted); }
+.severity-opt .sev-icon { font-size: 24px; margin-bottom: 6px; }
+.severity-opt .sev-name { font-size: 12px; font-weight: 700; }
+.severity-opt .sev-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+.severity-opt.danger { border-color: rgba(239,68,68,0.4); }
+.severity-opt.danger .sev-icon, .severity-opt.danger .sev-name { color: var(--red); }
+.severity-opt.danger:hover, .severity-opt.danger.selected { background: rgba(239,68,68,0.1); border-color: var(--red); }
+.severity-opt.warning { border-color: rgba(245,158,11,0.4); }
+.severity-opt.warning .sev-icon, .severity-opt.warning .sev-name { color: var(--amber); }
+.severity-opt.warning:hover, .severity-opt.warning.selected { background: rgba(245,158,11,0.1); border-color: var(--amber); }
+.severity-opt.safe { border-color: rgba(16,185,129,0.4); }
+.severity-opt.safe .sev-icon, .severity-opt.safe .sev-name { color: var(--emerald); }
+.severity-opt.safe:hover, .severity-opt.safe.selected { background: rgba(16,185,129,0.1); border-color: var(--emerald); }
+
+.form-group { margin-bottom: 22px; }
+.form-group label {
+  display: block; font-size: 13px; font-weight: 600;
+  color: var(--text-secondary); margin-bottom: 8px;
+}
+.form-group label .required { color: var(--red); margin-right: 2px; }
+.input-wrapper { position: relative; }
+.input-wrapper .input-icon {
+  position: absolute; right: 14px; top: 14px;
+  font-size: 14px; color: var(--text-muted);
+}
+.form-input {
+  width: 100%; padding: 13px 42px 13px 18px;
+  background: var(--bg-deep); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text-primary);
+  font-size: 13px; font-family: inherit; transition: all .25s;
+}
+.form-input::placeholder { color: var(--text-muted); }
+.form-input:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(6,182,212,0.1); }
+textarea.form-input { resize: vertical; min-height: 100px; padding-top: 13px; }
+.form-select {
+  width: 100%; padding: 13px 18px;
+  background: var(--bg-deep); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text-primary);
+  font-size: 13px; font-family: inherit; transition: all .25s;
+  appearance: none; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 8L2 4h8z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 18px center;
+}
+.form-select:focus { outline: none; border-color: var(--cyan); }
+.form-row-double {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+
+/* Photo upload */
+.photo-upload {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 32px 20px;
+  text-align: center;
+  transition: all .25s;
+  cursor: pointer;
+  background: var(--bg-deep);
+}
+.photo-upload:hover { border-color: var(--cyan); background: rgba(6,182,212,0.03); }
+.photo-upload .pu-icon { font-size: 36px; color: var(--text-muted); margin-bottom: 10px; }
+.photo-upload .pu-text { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; }
+.photo-upload .pu-hint { font-size: 11px; color: var(--text-muted); }
+.photo-upload .pu-formats {
+  display: flex; gap: 8px; justify-content: center; margin-top: 12px;
+}
+.photo-upload .pu-format {
+  font-size: 9px; padding: 2px 8px;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--text-muted);
+}
+
+/* Checkbox */
+.checkbox-wrapper {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 12px; color: var(--text-secondary); cursor: pointer;
+  margin-bottom: 24px; line-height: 1.7;
+}
+.checkbox-wrapper input[type="checkbox"] { accent-color: var(--cyan); margin-top: 2px; }
+
+/* Submit */
+.btn-submit {
+  width: 100%; padding: 15px;
+  background: var(--red); color: var(--bg-deep);
+  border: none; border-radius: 8px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: all .25s;
+  font-family: inherit;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-submit:hover { box-shadow: 0 0 24px rgba(239,68,68,0.4); transform: translateY(-2px); }
+.btn-cancel {
+  display: block; text-align: center;
+  margin-top: 14px;
+  font-size: 12px; color: var(--text-muted);
+  transition: color .25s;
+}
+.btn-cancel:hover { color: var(--text-secondary); }
+
+/* AI verification note */
+.ai-note {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 14px 16px;
+  background: rgba(16,185,129,0.06);
+  border: 1px solid rgba(16,185,129,0.15);
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+.ai-note .ai-icon { font-size: 18px; color: var(--emerald); flex-shrink: 0; }
+.ai-note p { font-size: 11px; color: var(--text-secondary); line-height: 1.7; }
+.ai-note p strong { color: var(--emerald); }
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-logo">◆ <span>مَجرى</span></div>
+  <div class="nav-links">
+    <a href="index.html">الرئيسية</a>
+    <a href="majra.html">الرادار</a>
+    <a href="feed.html">التقارير</a>
+    <a href="safety.html">السلامة</a>
+    <a href="about.html">حول</a>
+    <a href="contact.html">تواصل</a>
+    <a href="profile.html">حسابي</a>
+    <a href="report.html" class="nav-cta">رفع بلاغ</a>
+  </div>
+</nav>
+
+<div class="report-container">
+  <div class="report-header">
+    <div class="header-icon">⚑</div>
+    <h1>رفع بلاغ عن سيول أو خطر</h1>
+    <p>سجّل ملاحظاتك عن حالة الطقس أو السيول في منطقتك. سيتم التحقق من بلاغك تلقائياً عبر الذكاء الاصطناعي ونشره على الخريطة وتدفق التقارير.</p>
+  </div>
+
+  <div class="urgency-bar">
+    <span class="u-icon">⚠️</span>
+    <span class="u-text">إذا كان هناك <strong>خطر مباشر على الأرواح</strong>، اتصل بالدفاع المدني على <strong>١٩٩</strong> أو الأمن العام على <strong>٩١١</strong> فوراً قبل رفع البلاغ.</span>
+  </div>
+
+  <div class="form-card">
+    <div class="severity-section">
+      <label>درجة الخطر <span class="required">*</span></label>
+      <div class="severity-options">
+        <div class="severity-opt danger selected">
+          <div class="sev-icon">⚑</div>
+          <div class="sev-name">خطر شديد</div>
+          <div class="sev-desc">سيول جارفة أو إخلاء</div>
+        </div>
+        <div class="severity-opt warning">
+          <div class="sev-icon">⚠</div>
+          <div class="sev-name">تحذير</div>
+          <div class="sev-desc">أمطار غزيرة أو ارتفاع منسوب</div>
+        </div>
+        <div class="severity-opt safe">
+          <div class="sev-icon">✓</div>
+          <div class="sev-name">مستقر</div>
+          <div class="sev-desc">وضع طبيعي</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>نوع البلاغ <span class="required">*</span></label>
+      <select class="form-select">
+        <option>سيول منقولة</option>
+        <option>ارتفاع منسوب مياه</option>
+        <option>أمطار غزيرة</option>
+        <option>طريق مغلق</option>
+        <option>تشبع أرضي</option>
+        <option>عاصفة رعدية</option>
+        <option>جسر مغمور</option>
+        <option>إنقاذ محاصرين</option>
+        <option>حالة طبيعية / مستقرة</option>
+        <option>أخرى</option>
+      </select>
+    </div>
+
+    <div class="form-row-double">
+      <div class="form-group">
+        <label>المحافظة <span class="required">*</span></label>
+        <select class="form-select">
+          <option>عمان</option>
+          <option>معان</option>
+          <option>العقبة</option>
+          <option>الكرك</option>
+          <option>الطفيلة</option>
+          <option>السلط</option>
+          <option>إربد</option>
+          <option>الزرقاء</option>
+          <option>مادبا</option>
+          <option>جرش</option>
+          <option>عجلون</option>
+          <option>المفرق</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>المنطقة / الموقع التفصيلي <span class="required">*</span></label>
+        <div class="input-wrapper">
+          <span class="input-icon">⚲</span>
+          <input type="text" class="form-input" placeholder="مثال: وادي موسى — قرب Petra">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>وصف الحالة <span class="required">*</span></label>
+      <div class="input-wrapper">
+        <span class="input-icon">✎</span>
+        <textarea class="form-input" placeholder="اكتب وصفاً مفصّلاً لما تشاهده: مستوى المياه، حالة الطريق، عدد الأشخاص المتأثرين، أي تفاصيل تساعد فرق الاستجابة..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>إرفاق صورة</label>
+      <div class="photo-upload">
+        <div class="pu-icon">📷</div>
+        <div class="pu-text">اضغط لرفع صورة من جهازك</div>
+        <div class="pu-hint">الصور تزيد موثوقية البلاغ وتسرّع التحقق</div>
+        <div class="pu-formats">
+          <span class="pu-format">JPG</span>
+          <span class="pu-format">PNG</span>
+          <span class="pu-format">HEIC</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-note">
+      <span class="ai-icon">✓</span>
+      <p><strong>التحقق التلقائي:</strong> سيتم فحص بلاغك وصورتك تلقائياً عبر نظام الذكاء الاصطناعي للتأكد من مطابقتها للحالة الجوية في منطقتك قبل النشر. البلاغات الموثّقة تظهر بوسم "موثّق بالذكاء الاصطناعي" على الخريطة والتدفق.</p>
+    </div>
+
+    <label class="checkbox-wrapper">
+      <input type="checkbox">
+      <span>أؤكد أن المعلومات الواردة في هذا البلاغ صحيحة ودقيقة قدر علمي، وأتحمل مسؤولية صحة البلاغ وفقاً لقواعد منصة مَجرى.</span>
+    </label>
+
+    <button type="button" class="btn-submit">⚑ إرسال البلاغ فوراً</button>
+    <a href="feed.html" class="btn-cancel">إلغاء والعودة للتقارير</a>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حول المنصة | مَجرى</title>
+<style>
+:root {
+  --bg-deep: #0b0f19;
+  --bg-card: #111827;
+  --bg-card-hover: #161e2f;
+  --border: #374151;
+  --cyan: #06b6d4;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.8;
+  min-width: 100%;
+}
+a { text-decoration: none; color: inherit; }
+
+/* Navbar */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 32px;
+  background: rgba(11,15,25,0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+.nav-logo { font-size: 20px; font-weight: 800; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+.nav-logo span { color: var(--text-primary); }
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a { font-size: 13px; color: var(--text-secondary); transition: color .25s; }
+.nav-links a:hover { color: var(--cyan); }
+.nav-links a.active { color: var(--cyan); border-bottom: 2px solid var(--cyan); padding-bottom: 4px; }
+.nav-login-btn {
+  padding: 8px 20px; border: 1px solid var(--cyan);
+  border-radius: 6px; color: var(--cyan);
+  font-size: 12px; font-weight: 600;
+  transition: all .25s;
+}
+.nav-login-btn:hover { background: var(--cyan); color: var(--bg-deep); }
+
+/* Hero section */
+.about-hero {
+  max-width: 900px; margin: 0 auto;
+  padding: 60px 32px 40px;
+  text-align: center;
+  position: relative;
+}
+.about-hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+}
+.about-hero .hero-icon { font-size: 48px; color: var(--cyan); margin-bottom: 16px; }
+.about-hero h1 {
+  font-size: 36px; font-weight: 800;
+  margin-bottom: 12px;
+}
+.about-hero p {
+  font-size: 16px; color: var(--text-secondary);
+  max-width: 680px; margin: 0 auto;
+  line-height: 1.8;
+}
+
+/* Content sections */
+.content-section {
+  max-width: 900px; margin: 0 auto;
+  padding: 40px 32px;
+}
+.section-block {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-bottom: 24px;
+  position: relative;
+  transition: border .25s;
+}
+.section-block:hover { border-color: var(--cyan); }
+.section-block::before {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 4px; height: 100%;
+  background: var(--cyan);
+  border-radius: 12px 0 0 12px;
+}
+.section-block.emerald::before { background: var(--emerald); }
+.section-block.amber::before { background: var(--amber); }
+.section-block.red::before { background: var(--red); }
+
+.section-icon {
+  font-size: 24px; margin-bottom: 12px;
+}
+.section-block h2 {
+  font-size: 20px; font-weight: 700;
+  margin-bottom: 16px;
+}
+.section-block p {
+  font-size: 14px; color: var(--text-secondary);
+  margin-bottom: 12px;
+  line-height: 1.8;
+}
+.section-block p:last-child { margin-bottom: 0; }
+.section-block ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+.section-block ul li {
+  font-size: 13px; color: var(--text-secondary);
+  padding: 8px 0;
+  padding-right: 24px;
+  position: relative;
+  line-height: 1.7;
+}
+.section-block ul li::before {
+  content: '◆';
+  position: absolute; right: 0; top: 8px;
+  color: var(--cyan);
+  font-size: 10px;
+}
+.section-block.emerald ul li::before { color: var(--emerald); }
+.section-block.amber ul li::before { color: var(--amber); }
+.section-block.red ul li::before { color: var(--red); }
+
+/* Stats */
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  max-width: 900px; margin: 0 auto 40px;
+  padding: 0 32px;
+}
+.about-stat {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 24px;
+  text-align: center;
+  transition: all .25s;
+}
+.about-stat:hover { border-color: var(--cyan); transform: translateY(-3px); }
+.about-stat .num {
+  font-size: 32px; font-weight: 800;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 6px;
+}
+.about-stat .num.cyan { color: var(--cyan); }
+.about-stat .num.emerald { color: var(--emerald); }
+.about-stat .num.amber { color: var(--amber); }
+.about-stat .num.red { color: var(--red); }
+.about-stat .label { font-size: 11px; color: var(--text-muted); }
+
+/* CTA */
+.cta-section {
+  max-width: 900px; margin: 0 auto;
+  padding: 40px 32px 60px;
+  text-align: center;
+}
+.cta-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 40px;
+}
+.cta-box h3 {
+  font-size: 20px; font-weight: 700;
+  margin-bottom: 8px;
+}
+.cta-box p {
+  font-size: 13px; color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+.cta-buttons {
+  display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+}
+.btn-primary {
+  padding: 12px 32px;
+  background: var(--cyan); color: var(--bg-deep);
+  border: none; border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .25s;
+  font-family: inherit;
+}
+.btn-primary:hover { box-shadow: 0 0 20px rgba(6,182,212,0.5); transform: translateY(-2px); }
+.btn-secondary {
+  padding: 12px 32px;
+  background: transparent; color: var(--text-primary);
+  border: 1px solid var(--border); border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .25s;
+  font-family: inherit;
+}
+.btn-secondary:hover { border-color: var(--emerald); color: var(--emerald); transform: translateY(-2px); }
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-logo">◆ <span>مَجرى</span></div>
+  <div class="nav-links">
+    <a href="index.html">الرئيسية</a>
+    <a href="majra.html">الرادار</a>
+    <a href="feed.html">التقارير</a>
+    <a href="safety.html">السلامة</a>
+    <a href="about.html" class="active">حول</a>
+    <a href="contact.html">تواصل</a>
+    <a href="report.html">رفع بلاغ</a>
+    <a href="profile.html">حسابي</a>
+    <a href="login.html" class="nav-login-btn">تسجيل الدخول</a>
+  </div>
+</nav>
+
+<section class="about-hero">
+  <div class="hero-icon">◆</div>
+  <h1>مَجرى — رؤية نحو أردن أكثر أماناً</h1>
+  <p>منصة مَجرى هي نظام وطني متكامل للإنذار المبكر من مخاطر السيول والفيضانات في المملكة الأردنية الهاشمية، يجمع بين التقنية الحديثة ومراقبة المواطنين لحماية الأرواح والممتلكات.</p>
+</section>
+
+<div class="about-stats">
+  <div class="about-stat">
+    <div class="num cyan">٤٤</div>
+    <div class="label">منطقة مراقبة</div>
+  </div>
+  <div class="about-stat">
+    <div class="num emerald">١٢٤</div>
+    <div class="label">راصد نشط</div>
+  </div>
+  <div class="about-stat">
+    <div class="num amber">٣٢٠</div>
+    <div class="label">تقرير موثّق</div>
+  </div>
+  <div class="about-stat">
+    <div class="num red">٢٤/٧</div>
+    <div class="label">مراقبة مستمرة</div>
+  </div>
+</div>
+
+<div class="content-section">
+  <div class="section-block">
+    <div class="section-icon">🎯</div>
+    <h2>رؤية المنصة</h2>
+    <p>نسعى في مَجرى إلى بناء نظام وطني شامل ومتكامل للإنذار المبكر من مخاطر السيول، يضع المملكة الأردنية الهاشمية في طليعة دول العالم في مجال الحماية المدنية وإدارة الكوارث الطبيعية. رؤيتنا تقوم على مبدأ أساسي: لا خسارة في الأرواح بسبب السيول بعد اليوم.</p>
+    <p>تعتمد المنصة على ثلاث ركائز رئيسية: الرصد التقني عبر رادار الأمطار والأقمار الصناعية، المشاركة المجتمعية عبر تقارير المواطنين الراصدين، والتنسيق الفوري مع جهات الاستجابة من الدفاع المدني والأمن العام وفرق الإنقاذ.</p>
+  </div>
+
+  <div class="section-block emerald">
+    <div class="section-icon">📜</div>
+    <h2>قواعد النظام</h2>
+    <ul>
+      <li>كل راصد مسؤول عن دقة المعلومات التي يرفعها، ويتم التحقق من التقارير تلقائياً عبر نظام الذكاء الاصطناعي قبل نشرها.</li>
+      <li>تقارير الخطر الشديد تُحال فوراً إلى الدفاع المدني والأمن العام للتدخل السريع.</li>
+      <li>يُمنع نشر معلومات مضللة أو مبالغ فيها، ويتم تعليق حسابات المخالفين تلقائياً.</li>
+      <li>تُحدّث حالة المناطق على الخريطة كل ٥ دقائق بناءً على آخر التقارير وبيانات الرادار.</li>
+      <li>جميع البيانات متاحة للعموم ومجانية، وتُعتلك خصوصية الراصدين ومواقعهم محمية بالكامل.</li>
+      <li>المنصة مستقلة وغير تابعة لأي جهة سياسية، وتعمل لخدمة المواطن الأردني حصراً.</li>
+    </ul>
+  </div>
+
+  <div class="section-block amber">
+    <div class="section-icon">🛡</div>
+    <h2>أهداف السلامة العامة</h2>
+    <p>تهدف منصة مَجرى إلى تحقيق مجموعة من الأهداف الاستراتيجية للسلامة العامة في المملكة، تجمع بين التكنولوجيا والعمل المجتمعي التشاركي لخلق بيئة أكثر أماناً للجميع:</p>
+    <ul>
+      <li>تقليص زمن الاستجابة للطوارئ إلى أقل من ٥ دقائق من لحظة رصد الخطر.</li>
+      <li>توعية المواطنين بمخاطر الأودية ومناطق تصريف المياه أثناء فصل الشتاء.</li>
+      <li>بناء قاعدة بيانات وطنية شاملة لتاريخ السيول في المملكة لمساعدة الباحثين والمخططين.</li>
+      <li>توفير معلومات لحظية وموثوقة للإعلام والمواطنين أثناء حالات الطقس السيء.</li>
+      <li>تنسيق جهود فرق الإنقاذ والدفاع المدني وتوجيهها للمناطق الأكثر احتياجاً.</li>
+    </ul>
+  </div>
+
+  <div class="section-block red">
+    <div class="section-icon">⚠</div>
+    <h2>إخلاء المسؤولية</h2>
+    <p>منصة مَجرى هي أداة مساندة للإنذار المبكر ولا تُغني أبداً عن تعليمات وتوجيهات الدفاع المدني الأردني والأمن العام. في حالة الطوارئ القصوى، يجب الاتصال مباشرة بالأرقام الرسمية: الدفاع المدني ١٩٩، الأمن العام ٩١١.</p>
+    <p>تُبذل جميع الجهود لضمان دقة المعلومات المعروضة على المنصة، لكن المنصة لا تتحمل مسؤولية أي قرارات تتخذ بناءً على بيانات تقارير المواطنين. المصدر الرسمي والوحيد للقرارات المتعلقة بالإخلاء والتدخل هو الدفاع المدني الأردني.</p>
+  </div>
+</div>
+
+<div class="cta-section">
+  <div class="cta-box">
+    <h3>كن جزءاً من نظام الحماية الوطني</h3>
+    <p>انضم إلى مئات الراصدين الذين يساهمون في حماية مجتمعاتهم من مخاطر السيول</p>
+    <div class="cta-buttons">
+      <a href="signup.html"><button class="btn-primary">إنشاء حساب راصد</button></a>
+      <a href="majra.html"><button class="btn-secondary">عرض خريطة الرادار</button></a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

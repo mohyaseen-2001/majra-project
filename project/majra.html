@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مَجرى | خريطة الرادار</title>
+<style>
+:root {
+  --bg-deep: #0b0f19;
+  --bg-card: #111827;
+  --bg-card-hover: #161e2f;
+  --border: #374151;
+  --cyan: #06b6d4;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-size: 11px;
+  line-height: 1.6;
+  min-width: 100%;
+}
+a { text-decoration: none; color: inherit; }
+
+/* Navbar */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 24px;
+  background: rgba(11,15,25,0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+.nav-logo { font-size: 18px; font-weight: 800; color: var(--cyan); display: flex; align-items: center; gap: 6px; }
+.nav-logo span { color: var(--text-primary); }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 11px; color: var(--text-secondary); transition: color .25s; }
+.nav-links a:hover { color: var(--cyan); }
+.nav-links a.active { color: var(--cyan); border-bottom: 2px solid var(--cyan); padding-bottom: 3px; }
+.nav-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: var(--emerald);
+  padding: 5px 12px; background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2); border-radius: 6px;
+}
+.nav-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* Alert Banner */
+.alert-banner {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 12px 24px;
+  background: linear-gradient(90deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05), rgba(239,68,68,0.15));
+  border-bottom: 1px solid rgba(239,68,68,0.3);
+  color: var(--red);
+  font-size: 14px; font-weight: 700;
+  animation: flash 1.5s infinite;
+}
+@keyframes flash {
+  0%, 100% { background: linear-gradient(90deg, rgba(239,68,68,0.15), rgba(239,68,68,0.05), rgba(239,68,68,0.15)); }
+  50% { background: linear-gradient(90deg, rgba(239,68,68,0.3), rgba(239,68,68,0.1), rgba(239,68,68,0.3)); }
+}
+.alert-icon { font-size: 18px; }
+
+/* Main Layout */
+.main-layout {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 12px;
+  padding: 12px 24px;
+  min-height: calc(100vh - 130px);
+}
+
+/* Map Viewport */
+.map-viewport {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  min-height: 600px;
+}
+.map-grid-bg {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    linear-gradient(rgba(6,182,212,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6,182,212,0.06) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.map-grid-bg::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at 50% 40%, rgba(6,182,212,0.04) 0%, transparent 60%);
+}
+.map-coordinates {
+  position: absolute; top: 12px; right: 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 10px; color: var(--text-muted);
+  background: rgba(11,15,25,0.7);
+  padding: 6px 12px; border-radius: 6px;
+  border: 1px solid var(--border);
+  z-index: 5;
+}
+.map-legend {
+  position: absolute; bottom: 12px; right: 12px;
+  background: rgba(11,15,25,0.85);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  z-index: 5;
+}
+.map-legend h4 { font-size: 10px; color: var(--text-secondary); margin-bottom: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 10px; }
+.legend-item:last-child { margin-bottom: 0; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+.legend-dot.red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.legend-dot.amber { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.legend-dot.emerald { background: var(--emerald); box-shadow: 0 0 6px var(--emerald); }
+.legend-dot.cyan { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+
+/* Radar rings */
+.radar-rings {
+  position: absolute; top: 45%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.radar-ring {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(6,182,212,0.15);
+  border-radius: 50%;
+}
+.radar-ring:nth-child(1) { width: 80px; height: 80px; }
+.radar-ring:nth-child(2) { width: 160px; height: 160px; }
+.radar-ring:nth-child(3) { width: 240px; height: 240px; }
+.radar-ring:nth-child(4) { width: 320px; height: 320px; }
+.radar-sweep {
+  position: absolute; top: 50%; left: 50%;
+  width: 160px; height: 160px;
+  transform-origin: 0 0;
+  background: conic-gradient(from 0deg, rgba(6,182,212,0.12), transparent 60deg);
+  animation: rotate 4s linear infinite;
+  border-radius: 50%;
+}
+@keyframes rotate { to { transform: rotate(360deg); } }
+
+/* Alert zones (circles) */
+.alert-zone {
+  position: absolute;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  z-index: 3;
+}
+.alert-zone .zone-label {
+  position: absolute; bottom: -20px;
+  font-size: 9px; white-space: nowrap;
+  color: var(--text-secondary);
+  background: rgba(11,15,25,0.8);
+  padding: 2px 8px; border-radius: 4px;
+}
+.zone-red {
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(239,68,68,0.25) 0%, rgba(239,68,68,0.05) 70%, transparent 100%);
+  border: 1px solid rgba(239,68,68,0.4);
+  animation: zone-pulse-red 2s infinite;
+}
+@keyframes zone-pulse-red {
+  0%, 100% { box-shadow: 0 0 10px rgba(239,68,68,0.2); }
+  50% { box-shadow: 0 0 25px rgba(239,68,68,0.4); }
+}
+.zone-amber {
+  width: 90px; height: 90px;
+  background: radial-gradient(circle, rgba(245,158,11,0.2) 0%, rgba(245,158,11,0.05) 70%, transparent 100%);
+  border: 1px solid rgba(245,158,11,0.35);
+  animation: zone-pulse-amber 3s infinite;
+}
+@keyframes zone-pulse-amber {
+  0%, 100% { box-shadow: 0 0 8px rgba(245,158,11,0.15); }
+  50% { box-shadow: 0 0 18px rgba(245,158,11,0.3); }
+}
+.zone-emerald {
+  width: 70px; height: 70px;
+  background: radial-gradient(circle, rgba(16,185,129,0.18) 0%, rgba(16,185,129,0.05) 70%, transparent 100%);
+  border: 1px solid rgba(16,185,129,0.3);
+}
+
+/* Map pins */
+.map-pin {
+  position: absolute;
+  z-index: 4;
+  display: flex; flex-direction: column; align-items: center;
+}
+.map-pin .pin-icon {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+.map-pin .pin-icon span { transform: rotate(45deg); }
+.map-pin .pin-icon.danger { background: var(--red); }
+.map-pin .pin-icon.warning { background: var(--amber); }
+.map-pin .pin-icon.safe { background: var(--emerald); }
+.map-pin .pin-icon.info { background: var(--cyan); }
+.map-pin .pin-label {
+  margin-top: 6px;
+  font-size: 9px; white-space: nowrap;
+  background: rgba(11,15,25,0.85);
+  padding: 3px 8px; border-radius: 4px;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+/* Map watermark text */
+.map-watermark {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 48px; font-weight: 800;
+  color: rgba(6,182,212,0.03);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Sidebar */
+.sidebar {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.sidebar-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.sidebar-card h3 {
+  font-size: 12px; font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 6px;
+}
+.alert-item {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(55,65,81,0.5);
+}
+.alert-item:last-child { border-bottom: none; padding-bottom: 0; }
+.alert-item-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 4px;
+}
+.alert-badge {
+  font-size: 9px; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px;
+}
+.alert-badge.danger { background: rgba(239,68,68,0.15); color: var(--red); }
+.alert-badge.warning { background: rgba(245,158,11,0.15); color: var(--amber); }
+.alert-badge.safe { background: rgba(16,185,129,0.15); color: var(--emerald); }
+.alert-item h4 { font-size: 11px; font-weight: 600; }
+.alert-item p { font-size: 10px; color: var(--text-secondary); }
+.alert-item .alert-time { font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+
+.stats-mini {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+.stat-mini {
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+.stat-mini .num { font-size: 22px; font-weight: 800; font-family: 'Courier New', monospace; }
+.stat-mini .num.red { color: var(--red); }
+.stat-mini .num.amber { color: var(--amber); }
+.stat-mini .num.emerald { color: var(--emerald); }
+.stat-mini .num.cyan { color: var(--cyan); }
+.stat-mini .label { font-size: 9px; color: var(--text-muted); margin-top: 4px; }
+
+/* Road closures */
+.road-closure {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(55,65,81,0.4);
+}
+.road-closure:last-child { border-bottom: none; padding-bottom: 0; }
+.road-closure .closure-icon {
+  width: 20px; height: 20px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0;
+  background: rgba(239,68,68,0.12); color: var(--red);
+}
+.road-closure .road-name { font-size: 10px; color: var(--text-primary); flex: 1; }
+.road-closure .road-status { font-size: 9px; color: var(--red); }
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-logo">◆ <span>مَجرى</span></div>
+  <div class="nav-links">
+    <a href="index.html">الرئيسية</a>
+    <a href="majra.html" class="active">الرادار</a>
+    <a href="feed.html">التقارير</a>
+    <a href="safety.html">السلامة</a>
+    <a href="about.html">حول</a>
+    <a href="contact.html">تواصل</a>
+    <a href="report.html">رفع بلاغ</a>
+    <a href="profile.html">حسابي</a>
+  </div>
+  <div class="nav-status">
+    <div class="dot"></div>
+    <span>الرادار متصل — آخر تحديث ١٢:٤٧ ص</span>
+  </div>
+</nav>
+
+<div class="alert-banner">
+  <span class="alert-icon">⚠️</span>
+  <span>تحذير عاجل من الدفاع المدني: يرجى إخلاء وادي موسى فوراً لوجود سيول منقولة جارفة!</span>
+  <span class="alert-icon">⚠️</span>
+</div>
+
+<div class="main-layout">
+  <div class="map-viewport">
+    <div class="map-grid-bg"></div>
+    <div class="map-watermark">مَجرى</div>
+
+    <div class="map-coordinates">الإحداثيات: ٣٥٫٩٣٥° شمال / ٣١٫٩٥٢° شرق — الأردن</div>
+
+    <!-- Radar rings -->
+    <div class="radar-rings">
+      <div class="radar-ring"></div>
+      <div class="radar-ring"></div>
+      <div class="radar-ring"></div>
+      <div class="radar-ring"></div>
+    </div>
+    <div class="radar-sweep"></div>
+
+    <!-- Alert zones -->
+    <div class="alert-zone zone-red" style="top: 30%; left: 35%;">
+      <div class="zone-label">وادي موسى — خطر شديد</div>
+    </div>
+    <div class="alert-zone zone-amber" style="top: 55%; left: 65%;">
+      <div class="zone-label">البحر الميت — تحذير</div>
+    </div>
+    <div class="alert-zone zone-amber" style="top: 20%; left: 70%;">
+      <div class="zone-label"> البتراء — حذر</div>
+    </div>
+    <div class="alert-zone zone-emerald" style="top: 70%; left: 25%;">
+      <div class="zone-label">العقبة — مستقر</div>
+    </div>
+    <div class="alert-zone zone-red" style="top: 40%; left: 80%;">
+      <div class="zone-label">وادي عربة — خطر سيول</div>
+    </div>
+
+    <!-- Map pins -->
+    <div class="map-pin" style="top: 28%; left: 32%;">
+      <div class="pin-icon danger"><span>⚑</span></div>
+      <div class="pin-label">سيول جارفة — وادي موسى</div>
+    </div>
+    <div class="map-pin" style="top: 18%; left: 68%;">
+      <div class="pin-icon warning"><span>⚠</span></div>
+      <div class="pin-label">ارتفاع منسوب المياه — البتراء</div>
+    </div>
+    <div class="map-pin" style="top: 53%; left: 62%;">
+      <div class="pin-icon warning"><span>⚠</span></div>
+      <div class="pin-label">تشبع أرضي — البحر الميت</div>
+    </div>
+    <div class="map-pin" style="top: 38%; left: 78%;">
+      <div class="pin-icon danger"><span>✕</span></div>
+      <div class="pin-label">طريق مغلق — وادي عربة</div>
+    </div>
+    <div class="map-pin" style="top: 68%; left: 22%;">
+      <div class="pin-icon safe"><span>✓</span></div>
+      <div class="pin-label">منطقة آمنة — العقبة</div>
+    </div>
+    <div class="map-pin" style="top: 60%; left: 45%;">
+      <div class="pin-icon info"><span>◎</span></div>
+      <div class="pin-label">محطة رصد — وادي شعيب</div>
+    </div>
+    <div class="map-pin" style="top: 15%; left: 40%;">
+      <div class="pin-icon warning"><span>⚠</span></div>
+      <div class="pin-label">أمطار غزيرة — الطفيلة</div>
+    </div>
+    <div class="map-pin" style="top: 75%; left: 55%;">
+      <div class="pin-icon safe"><span>✓</span></div>
+      <div class="pin-label">وضع طبيعي — الكرك</div>
+    </div>
+
+    <div class="map-legend">
+      <h4>دليل الخريطة</h4>
+      <div class="legend-item"><div class="legend-dot red"></div><span>خطر شديد — إخلاء فوري</span></div>
+      <div class="legend-item"><div class="legend-dot amber"></div><span>تحذير — حذر شديد</span></div>
+      <div class="legend-item"><div class="legend-dot emerald"></div><span>منطقة مستقرة</span></div>
+      <div class="legend-item"><div class="legend-dot cyan"></div><span>محطة رصد نشطة</span></div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="sidebar-card">
+      <h3>◉ الإحصائيات اللحظية</h3>
+      <div class="stats-mini">
+        <div class="stat-mini">
+          <div class="num red">٧</div>
+          <div class="label">خطر شديد</div>
+        </div>
+        <div class="stat-mini">
+          <div class="num amber">١٤</div>
+          <div class="label">تحذيرات</div>
+        </div>
+        <div class="stat-mini">
+          <div class="num emerald">٢٣</div>
+          <div class="label">مستقرة</div>
+        </div>
+        <div class="stat-mini">
+          <div class="num cyan">٤٤</div>
+          <div class="label">إجمالي</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>⚠ التنبيهات النشطة</h3>
+      <div class="alert-item">
+        <div class="alert-item-header">
+          <span class="alert-badge danger">خطر شديد</span>
+          <h4>وادي موسى</h4>
+        </div>
+        <p>سيول منقولة جارفة — إخلاء فوري مطلوب</p>
+        <div class="alert-time">قبل ٨ دقائق</div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-item-header">
+          <span class="alert-badge danger">خطر شديد</span>
+          <h4>وادي عربة</h4>
+        </div>
+        <p>ارتفاع مفاجئ في منسوب المياه</p>
+        <div class="alert-time">قبل ١٥ دقيقة</div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-item-header">
+          <span class="alert-badge warning">تحذير</span>
+          <h4>البتراء</h4>
+        </div>
+        <p>أمطار غزيرة مستمرة — خطر سيول محتمل</p>
+        <div class="alert-time">قبل ٢٢ دقيقة</div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-item-header">
+          <span class="alert-badge warning">تحذير</span>
+          <h4>البحر الميت</h4>
+        </div>
+        <p>تشبع أرضي مرتفع — تجنب الأودية</p>
+        <div class="alert-time">قبل ٣٥ دقيقة</div>
+      </div>
+      <div class="alert-item">
+        <div class="alert-item-header">
+          <span class="alert-badge safe">مستقر</span>
+          <h4>العقبة</h4>
+        </div>
+        <p>الأوضاع طبيعية — لا خطر مباشر</p>
+        <div class="alert-time">قبل ٤٠ دقيقة</div>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <h3>✕ إغلاقات الطرق</h3>
+      <div class="road-closure">
+        <div class="closure-icon">✕</div>
+        <div class="road-name">طريق وادي موسى — البتراء</div>
+        <div class="road-status">مغلق</div>
+      </div>
+      <div class="road-closure">
+        <div class="closure-icon">✕</div>
+        <div class="road-name">طريق وادي عربة الجنوبي</div>
+        <div class="road-status">مغلق</div>
+      </div>
+      <div class="road-closure">
+        <div class="closure-icon">⚠</div>
+        <div class="road-name">طريق الطفيلة — البحر الميت</div>
+        <div class="road-status">حذر</div>
+      </div>
+      <div class="road-closure">
+        <div class="closure-icon">⚠</div>
+        <div class="road-name">جسر وادي شعيب</div>
+        <div class="road-status">حذر</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

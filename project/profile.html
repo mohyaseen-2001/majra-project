@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الملف الشخصي | مَجرى</title>
+<style>
+:root {
+  --bg-deep: #0b0f19;
+  --bg-card: #111827;
+  --bg-card-hover: #161e2f;
+  --border: #374151;
+  --cyan: #06b6d4;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.6;
+  min-width: 100%;
+}
+a { text-decoration: none; color: inherit; }
+
+/* Navbar */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 32px;
+  background: rgba(11,15,25,0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+.nav-logo { font-size: 20px; font-weight: 800; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+.nav-logo span { color: var(--text-primary); }
+.nav-links { display: flex; gap: 28px; align-items: center; }
+.nav-links a { font-size: 13px; color: var(--text-secondary); transition: color .25s; }
+.nav-links a:hover { color: var(--cyan); }
+.nav-links a.active { color: var(--cyan); border-bottom: 2px solid var(--cyan); padding-bottom: 4px; }
+.nav-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(6,182,212,0.15);
+  border: 1px solid var(--cyan);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: var(--cyan);
+  cursor: pointer; transition: all .25s;
+}
+.nav-avatar:hover { box-shadow: 0 0 12px rgba(6,182,212,0.4); }
+
+/* Profile layout */
+.profile-container {
+  max-width: 1200px; margin: 0 auto;
+  padding: 32px;
+}
+
+/* Profile header card */
+.profile-header {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 24px;
+  position: relative; overflow: hidden;
+  flex-wrap: wrap;
+}
+.profile-header::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--cyan), var(--emerald));
+}
+.profile-avatar {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(6,182,212,0.2), rgba(16,185,129,0.2));
+  border: 2px solid var(--cyan);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 42px; font-weight: 800; color: var(--cyan);
+  flex-shrink: 0;
+  box-shadow: 0 0 24px rgba(6,182,212,0.2);
+}
+.profile-info { flex: 1; min-width: 200px; }
+.profile-info .verified-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600;
+  padding: 4px 12px; border-radius: 4px;
+  background: rgba(16,185,129,0.12);
+  color: var(--emerald);
+  margin-bottom: 10px;
+}
+.profile-info h1 {
+  font-size: 24px; font-weight: 800;
+  margin-bottom: 6px;
+}
+.profile-info .profile-email {
+  font-size: 13px; color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.profile-info .profile-location {
+  font-size: 12px; color: var(--text-muted);
+  display: flex; align-items: center; gap: 6px;
+}
+.profile-info .profile-joined {
+  font-size: 11px; color: var(--text-muted);
+  margin-top: 4px;
+}
+.profile-actions {
+  display: flex; gap: 12px; flex-shrink: 0;
+}
+.btn-edit {
+  padding: 10px 24px;
+  background: var(--cyan); color: var(--bg-deep);
+  border: none; border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .25s;
+  font-family: inherit;
+}
+.btn-edit:hover { box-shadow: 0 0 20px rgba(6,182,212,0.4); transform: translateY(-2px); }
+.btn-logout {
+  padding: 10px 24px;
+  background: transparent; color: var(--red);
+  border: 1px solid rgba(239,68,68,0.3); border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all .25s;
+  font-family: inherit;
+}
+.btn-logout:hover { background: rgba(239,68,68,0.1); border-color: var(--red); }
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  transition: all .25s;
+}
+.stat-card:hover { border-color: var(--cyan); transform: translateY(-3px); }
+.stat-card .stat-icon {
+  font-size: 22px; margin-bottom: 10px;
+}
+.stat-card .stat-num {
+  font-size: 30px; font-weight: 800;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 4px;
+}
+.stat-card .stat-num.cyan { color: var(--cyan); }
+.stat-card .stat-num.emerald { color: var(--emerald); }
+.stat-card .stat-num.amber { color: var(--amber); }
+.stat-card .stat-num.red { color: var(--red); }
+.stat-card .stat-label { font-size: 11px; color: var(--text-muted); }
+
+/* Two column layout */
+.profile-cols {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+}
+@media (max-width: 900px) {
+  .profile-cols { grid-template-columns: 1fr; }
+}
+
+/* Reports list */
+.reports-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+.section-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.section-head h2 {
+  font-size: 16px; font-weight: 700;
+  color: var(--cyan);
+}
+.section-head .count {
+  font-size: 11px; color: var(--text-muted);
+  padding: 3px 10px; background: var(--bg-deep);
+  border: 1px solid var(--border); border-radius: 4px;
+}
+.report-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(55,65,81,0.4);
+  transition: padding .2s;
+}
+.report-row:hover { padding-right: 4px; }
+.report-row:last-child { border-bottom: none; padding-bottom: 0; }
+.report-row .report-status-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+}
+.report-row .report-status-dot.danger { background: var(--red); box-shadow: 0 0 6px var(--red); }
+.report-row .report-status-dot.warning { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.report-row .report-status-dot.safe { background: var(--emerald); box-shadow: 0 0 6px var(--emerald); }
+.report-row-content { flex: 1; }
+.report-row-content .rr-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.report-row-content .rr-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; }
+.report-row-content .rr-meta .rr-verified {
+  color: var(--emerald); display: flex; align-items: center; gap: 3px;
+}
+.report-row .rr-badge {
+  font-size: 10px; font-weight: 700;
+  padding: 3px 10px; border-radius: 4px;
+  flex-shrink: 0;
+}
+.rr-badge.danger { background: rgba(239,68,68,0.15); color: var(--red); }
+.rr-badge.warning { background: rgba(245,158,11,0.15); color: var(--amber); }
+.rr-badge.safe { background: rgba(16,185,129,0.15); color: var(--emerald); }
+
+/* Sidebar */
+.profile-sidebar {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.side-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: border .25s;
+}
+.side-card:hover { border-color: var(--cyan); }
+.side-card h3 {
+  font-size: 13px; font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.achievement-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(55,65,81,0.4);
+}
+.achievement-item:last-child { border-bottom: none; padding-bottom: 0; }
+.achievement-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.achievement-icon.gold { background: rgba(245,158,11,0.12); color: var(--amber); }
+.achievement-icon.cyan { background: rgba(6,182,212,0.12); color: var(--cyan); }
+.achievement-icon.emerald { background: rgba(16,185,129,0.12); color: var(--emerald); }
+.achievement-icon.muted { background: rgba(107,114,128,0.12); color: var(--text-muted); }
+.achievement-info .ach-name { font-size: 12px; font-weight: 600; }
+.achievement-info .ach-desc { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+.rank-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.rank-label { font-size: 12px; color: var(--text-secondary); }
+.rank-value { font-size: 14px; font-weight: 700; color: var(--cyan); }
+.progress-track {
+  width: 100%; height: 8px;
+  background: var(--bg-deep); border-radius: 4px;
+  overflow: hidden; margin-bottom: 8px;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--emerald));
+  border-radius: 4px;
+  transition: width .5s;
+}
+.progress-text { font-size: 10px; color: var(--text-muted); }
+
+.setting-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(55,65,81,0.4);
+}
+.setting-item:last-child { border-bottom: none; padding-bottom: 0; }
+.setting-item .setting-label { font-size: 12px; color: var(--text-secondary); }
+.toggle {
+  width: 36px; height: 20px;
+  background: var(--bg-deep); border: 1px solid var(--border);
+  border-radius: 10px; position: relative;
+  cursor: pointer; transition: all .25s;
+}
+.toggle::after {
+  content: '';
+  position: absolute; top: 2px; right: 2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--text-muted);
+  transition: all .25s;
+}
+.toggle.on { background: rgba(6,182,212,0.2); border-color: var(--cyan); }
+.toggle.on::after { right: auto; left: 2px; background: var(--cyan); }
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-logo">◆ <span>مَجرى</span></div>
+  <div class="nav-links">
+    <a href="index.html">الرئيسية</a>
+    <a href="majra.html">الرادار</a>
+    <a href="feed.html">التقارير</a>
+    <a href="safety.html">السلامة</a>
+    <a href="about.html">حول</a>
+    <a href="contact.html">تواصل</a>
+    <a href="report.html">رفع بلاغ</a>
+    <a href="profile.html" class="nav-avatar">ح</a>
+  </div>
+</nav>
+
+<div class="profile-container">
+  <div class="profile-header">
+    <div class="profile-avatar">ح</div>
+    <div class="profile-info">
+      <div class="verified-tag">✓ راصد موثّق</div>
+      <h1>حسن العمري</h1>
+      <div class="profile-email">hassan.omari@majra.jo</div>
+      <div class="profile-location">⚲ وادي موسى — معان</div>
+      <div class="profile-joined">انضم في ١٢ شباط ٢٠٢٦</div>
+    </div>
+    <div class="profile-actions">
+      <a href="#"><button class="btn-edit">تعديل الملف</button></a>
+      <a href="login.html"><button class="btn-logout">تسجيل الخروج</button></a>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div class="stat-num cyan">٤٧</div>
+      <div class="stat-label">إجمالي التقارير</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✓</div>
+      <div class="stat-num emerald">٣٩</div>
+      <div class="stat-label">تقارير موثّقة</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⚠</div>
+      <div class="stat-num amber">١٢</div>
+      <div class="stat-label">إنذارات نشطة</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">★</div>
+      <div class="stat-num red">١٬٨٤٠</div>
+      <div class="stat-label">نقاط الرصد</div>
+    </div>
+  </div>
+
+  <div class="profile-cols">
+    <div class="reports-section">
+      <div class="section-head">
+        <h2>◉ تقاريري الأخيرة</h2>
+        <span class="count">٤٧ تقريراً</span>
+      </div>
+
+      <div class="report-row">
+        <div class="report-status-dot danger"></div>
+        <div class="report-row-content">
+          <div class="rr-title">سيول جارفة تجتاح وادي موسى</div>
+          <div class="rr-meta">
+            <span>⚲ وادي موسى — معان</span>
+            <span class="rr-verified">✓ موثّق</span>
+            <span>قبل ٨ دقائق</span>
+          </div>
+        </div>
+        <span class="rr-badge danger">خطر شديد</span>
+      </div>
+
+      <div class="report-row">
+        <div class="report-status-dot warning"></div>
+        <div class="report-row-content">
+          <div class="rr-title">ارتفاع منسوب مياه في وادي الموجب</div>
+          <div class="rr-meta">
+            <span>⛔ وادي الموجب — الكرك</span>
+            <span class="rr-verified">✓ موثّق</span>
+            <span>قبل ساعتين</span>
+          </div>
+        </div>
+        <span class="rr-badge warning">حذر</span>
+      </div>
+
+      <div class="report-row">
+        <div class="report-status-dot warning"></div>
+        <div class="report-row-content">
+          <div class="rr-title">أمطار غزيرة على الطفيلة</div>
+          <div class="rr-meta">
+            <span>⚲ الطفيلة</span>
+            <span class="rr-verified">✓ موثّق</span>
+            <span>قبل ٥ ساعات</span>
+          </div>
+        </div>
+        <span class="rr-badge warning">حذر</span>
+      </div>
+
+      <div class="report-row">
+        <div class="report-status-dot safe"></div>
+        <div class="report-row-content">
+          <div class="rr-title">الأوضاع طبيعية في Dana</div>
+          <div class="rr-meta">
+            <span>⛔ Dana — الطفيلة</span>
+            <span class="rr-verified">✓ موثّق</span>
+            <span>قبل يوم</span>
+          </div>
+        </div>
+        <span class="rr-badge safe">مستقر</span>
+      </div>
+
+      <div class="report-row">
+        <div class="report-status-dot danger"></div>
+        <div class="report-row-content">
+          <div class="rr-title">طريق مغلق بسبب تراكم السيول</div>
+          <div class="rr-meta">
+            <span>⛔ طريق العقبة — معان</span>
+            <span class="rr-verified">✓ موثّق</span>
+            <span>قبل يومين</span>
+          </div>
+        </div>
+        <span class="rr-badge danger">خطر شديد</span>
+      </div>
+
+      <div class="report-row">
+        <div class="report-status-dot warning"></div>
+        <div class="report-row-content">
+          <div class="rr-title">تشبع أرضي قرب البحر الميت</div>
+          <div class="rr-meta">
+            <span>⛔ البحر الميت — الكرك</span>
+            <span class="rr-verified">✓ موثّق</span>
+            <span>قبل ٣ أيام</span>
+          </div>
+        </div>
+        <span class="rr-badge warning">حذر</span>
+      </div>
+    </div>
+
+    <div class="profile-sidebar">
+      <div class="side-card">
+        <h3>★ مستوى الراصد</h3>
+        <div class="rank-bar">
+          <span class="rank-label">المستوى الحالي</span>
+          <span class="rank-value">راصد متقدّم</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width: 74%;"></div>
+        </div>
+        <div class="progress-text">١٬٨٤٠ / ٢٬٥٠٠ نقطة للترقية إلى "راصد خبير"</div>
+      </div>
+
+      <div class="side-card">
+        <h3>🏆 الإنجازات</h3>
+        <div class="achievement-item">
+          <div class="achievement-icon gold">★</div>
+          <div class="achievement-info">
+            <div class="ach-name">راصد الشهر</div>
+            <div class="ach-desc">أكثر الراصدين تقارير في شباط ٢٠٢٦</div>
+          </div>
+        </div>
+        <div class="achievement-item">
+          <div class="achievement-icon cyan">⚡</div>
+          <div class="achievement-info">
+            <div class="ach-name">أول المبلّغين</div>
+            <div class="ach-desc">أبلغ عن ٥ سيول قبل غيره</div>
+          </div>
+        </div>
+        <div class="achievement-item">
+          <div class="achievement-icon emerald">✓</div>
+          <div class="achievement-info">
+            <div class="ach-name">موثوقية عالية</div>
+            <div class="ach-desc">٨٣٪ من تقاريره موثّقة تلقائياً</div>
+          </div>
+        </div>
+        <div class="achievement-item">
+          <div class="achievement-icon muted">◇</div>
+          <div class="achievement-info">
+            <div class="ach-name">راصد مبتدئ</div>
+            <div class="ach-desc">قيد الإنجاز — ١٠ تقارير متبقية</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <h3>⚙ إعدادات الحساب</h3>
+        <div class="setting-item">
+          <span class="setting-label">إشعارات الطوارئ</span>
+          <div class="toggle on"></div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">إشعارات التقارير الموثّقة</span>
+          <div class="toggle on"></div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">إظهار موقعي للراصدين</span>
+          <div class="toggle"></div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">رسائل بريدية أسبوعية</span>
+          <div class="toggle on"></div>
+        </div>
+        <div class="setting-item">
+          <span class="setting-label">وضع عدم الإزعاج ليلاً</span>
+          <div class="toggle"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

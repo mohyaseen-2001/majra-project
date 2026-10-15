@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مَجرى | تدفق التقارير</title>
+<style>
+:root {
+  --bg-deep: #0b0f19;
+  --bg-card: #111827;
+  --bg-card-hover: #161e2f;
+  --border: #374151;
+  --cyan: #06b6d4;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-size: 11px;
+  line-height: 1.6;
+  min-width: 100%;
+}
+a { text-decoration: none; color: inherit; }
+
+/* Navbar */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 24px;
+  background: rgba(11,15,25,0.92);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+.nav-logo { font-size: 18px; font-weight: 800; color: var(--cyan); display: flex; align-items: center; gap: 6px; }
+.nav-logo span { color: var(--text-primary); }
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { font-size: 11px; color: var(--text-secondary); transition: color .25s; }
+.nav-links a:hover { color: var(--cyan); }
+.nav-links a.active { color: var(--cyan); border-bottom: 2px solid var(--cyan); padding-bottom: 3px; }
+.nav-status {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 10px; color: var(--emerald);
+  padding: 5px 12px; background: rgba(16,185,129,0.08);
+  border: 1px solid rgba(16,185,129,0.2); border-radius: 6px;
+}
+.nav-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* Stat panel */
+.stat-panel {
+  display: flex; gap: 0;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  max-width: 1600px; margin: 0 auto;
+}
+.stat-tab {
+  flex: 1;
+  padding: 16px 20px;
+  text-align: center;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+  transition: all .25s;
+  position: relative;
+}
+.stat-tab:first-child { border-left: none; }
+.stat-tab:hover { background: var(--bg-card); }
+.stat-tab.active { background: var(--bg-card); }
+.stat-tab.active::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-tab.active.all::after { background: var(--cyan); }
+.stat-tab.active.danger::after { background: var(--red); }
+.stat-tab.active.warning::after { background: var(--amber); }
+.stat-tab.active.safe::after { background: var(--emerald); }
+.stat-tab .tab-num {
+  font-size: 28px; font-weight: 800;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 4px;
+}
+.stat-tab .tab-num.all { color: var(--cyan); }
+.stat-tab .tab-num.danger { color: var(--red); }
+.stat-tab .tab-num.warning { color: var(--amber); }
+.stat-tab .tab-num.safe { color: var(--emerald); }
+.stat-tab .tab-label { font-size: 11px; color: var(--text-secondary); }
+
+/* Feed */
+.feed-container {
+  max-width: 1600px; margin: 0 auto;
+  padding: 24px;
+}
+.feed-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+}
+.feed-header h2 { font-size: 18px; font-weight: 700; }
+.feed-header p { font-size: 11px; color: var(--text-muted); }
+.filter-tags { display: flex; gap: 8px; }
+.filter-tag {
+  padding: 6px 14px;
+  font-size: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all .25s;
+}
+.filter-tag:hover { border-color: var(--cyan); color: var(--cyan); }
+.filter-tag.active { background: var(--cyan); color: var(--bg-deep); border-color: var(--cyan); }
+
+/* Report grid */
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+.report-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all .3s;
+}
+.report-card:hover { border-color: var(--cyan); transform: translateY(-3px); }
+.report-card.danger { border-top: 3px solid var(--red); }
+.report-card.warning { border-top: 3px solid var(--amber); }
+.report-card.safe { border-top: 3px solid var(--emerald); }
+
+.report-image {
+  width: 100%; height: 180px;
+  background: linear-gradient(135deg, #1a2332, #0d1117);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.report-image .placeholder-icon {
+  font-size: 48px; color: var(--text-muted); opacity: 0.3;
+}
+.report-image .image-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 8px 12px;
+  background: linear-gradient(transparent, rgba(11,15,25,0.9));
+  display: flex; justify-content: space-between; align-items: center;
+}
+.report-image .location-tag {
+  font-size: 9px; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 4px;
+}
+.report-image .severity-badge {
+  font-size: 9px; font-weight: 700;
+  padding: 3px 10px; border-radius: 4px;
+}
+.severity-badge.danger { background: rgba(239,68,68,0.2); color: var(--red); }
+.severity-badge.warning { background: rgba(245,158,11,0.2); color: var(--amber); }
+.severity-badge.safe { background: rgba(16,185,129,0.2); color: var(--emerald); }
+
+.report-body { padding: 14px; }
+.report-title {
+  font-size: 13px; font-weight: 700;
+  margin-bottom: 6px;
+}
+.report-desc {
+  font-size: 10px; color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.report-meta {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 10px;
+  border-top: 1px solid rgba(55,65,81,0.5);
+}
+.report-author {
+  display: flex; align-items: center; gap: 6px;
+}
+.author-avatar {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--bg-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--cyan);
+}
+.author-name { font-size: 10px; color: var(--text-secondary); }
+.report-time { font-size: 9px; color: var(--text-muted); }
+.verified-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 600;
+  padding: 3px 8px; border-radius: 4px;
+  background: rgba(16,185,129,0.1);
+  color: var(--emerald);
+  margin-bottom: 8px;
+}
+.report-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.report-tag {
+  font-size: 8px; padding: 2px 8px;
+  background: var(--bg-deep); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--text-muted);
+}
+</style>
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-logo">◆ <span>مَجرى</span></div>
+  <div class="nav-links">
+    <a href="index.html">الرئيسية</a>
+    <a href="majra.html">الرادار</a>
+    <a href="feed.html" class="active">التقارير</a>
+    <a href="safety.html">السلامة</a>
+    <a href="about.html">حول</a>
+    <a href="contact.html">تواصل</a>
+    <a href="report.html">رفع بلاغ</a>
+    <a href="profile.html">حسابي</a>
+  </div>
+  <div class="nav-status">
+    <div class="dot"></div>
+    <span>٤٤ تقريراً نشطاً</span>
+  </div>
+</nav>
+
+<div class="stat-panel">
+  <div class="stat-tab active all">
+    <div class="tab-num all">٤٤</div>
+    <div class="tab-label">الكل</div>
+  </div>
+  <div class="stat-tab danger">
+    <div class="tab-num danger">٧</div>
+    <div class="tab-label">خطر شديد</div>
+  </div>
+  <div class="stat-tab warning">
+    <div class="tab-num warning">١٤</div>
+    <div class="tab-label">حذر</div>
+  </div>
+  <div class="stat-tab safe">
+    <div class="tab-num safe">٢٣</div>
+    <div class="tab-label">مستقر</div>
+  </div>
+</div>
+
+<div class="feed-container">
+  <div class="feed-header">
+    <div>
+      <h2>تدفق تقارير السيول</h2>
+      <p>تقارير لحظية من الراصدين والمواطنين — مرتبة حسب الأحدث</p>
+    </div>
+    <div class="filter-tags">
+      <div class="filter-tag active">الكل</div>
+      <div class="filter-tag">سيول</div>
+      <div class="filter-tag">أمطار</div>
+      <div class="filter-tag">طرق</div>
+      <div class="filter-tag">إنقاذ</div>
+    </div>
+  </div>
+
+  <div class="report-grid">
+    <div class="report-card danger">
+      <div class="report-image">
+        <span class="placeholder-icon">⛰</span>
+        <div class="image-overlay">
+          <span class="location-tag">⚲ وادي موسى — معان</span>
+          <span class="severity-badge danger">خطر شديد</span>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="verified-badge">✓ موثّق بالذكاء الاصطناعي</div>
+        <div class="report-title">سيول جارفة تجتاح وادي موسى</div>
+        <div class="report-desc">منسوب المياه ارتفع بشكل مفاجئ في الوادي، تم إغلاق الطريق المؤدي إلى البتراء وبدأت عمليات الإخلاء. المواطنين يطلبون الدعم العاجل.</div>
+        <div class="report-tags">
+          <span class="report-tag">سيول</span>
+          <span class="report-tag">إخلاء</span>
+          <span class="report-tag">طريق مغلق</span>
+        </div>
+        <div class="report-meta">
+          <div class="report-author">
+            <div class="author-avatar">ح</div>
+            <span class="author-name">حسن العمري</span>
+          </div>
+          <span class="report-time">قبل ٨ دقائق</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card danger">
+      <div class="report-image">
+        <span class="placeholder-icon">🌊</span>
+        <div class="image-overlay">
+          <span class="location-tag">⚲ وادي عربة — العقبة</span>
+          <span class="severity-badge danger">خطر شديد</span>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="verified-badge">✓ موثّق بالذكاء الاصطناعي</div>
+        <div class="report-title">ارتفاع منسوب مياه وادي عربة</div>
+        <div class="report-desc">تدفق كبير للمياه من الشمال، الطريق الرئيسي مغلق بالكامل. فرق الدفاع المدني في الطريق إلى الموقع.</div>
+        <div class="report-tags">
+          <span class="report-tag">سيول</span>
+          <span class="report-tag">طريق مغلق</span>
+        </div>
+        <div class="report-meta">
+          <div class="report-author">
+            <div class="author-avatar">خ</div>
+            <span class="author-name">خالد الحوامدة</span>
+          </div>
+          <span class="report-time">قبل ١٥ دقيقة</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card warning">
+      <div class="report-image">
+        <span class="placeholder-icon">🌧</span>
+        <div class="image-overlay">
+          <span class="location-tag">⚲ البتراء — معان</span>
+          <span class="severity-badge warning">حذر</span>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="verified-badge">✓ موثّق بالذكاء الاصطناعي</div>
+        <div class="report-title">أمطار غزيرة مستمرة على البتراء</div>
+        <div class="report-desc">أمطار غزيرة متواصلة منذ ساعتين، الأودية المحيطة تبدأ في التشبع. يُنصح بتجنب المناطق المنخفضة والأودية.</div>
+        <div class="report-tags">
+          <span class="report-tag">أمطار</span>
+          <span class="report-tag">حذر</span>
+        </div>
+        <div class="report-meta">
+          <div class="report-author">
+            <div class="author-avatar">م</div>
+            <span class="author-name">محمد الزعبي</span>
+          </div>
+          <span class="report-time">قبل ٢٢ دقيقة</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card warning">
+      <div class="report-image">
+        <span class="placeholder-icon">💧</span>
+        <div class="image-overlay">
+          <span class="location-tag">⚲ البحر الميت — الكرك</span>
+          <span class="severity-badge warning">حذر</span>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="verified-badge">✓ موثّق بالذكاء الاصطناعي</div>
+        <div class="report-title">تشبع أرضي مرتفع — البحر الميت</div>
+        <div class="report-desc">الأرض المحيطة بالبحر الميت تشهد تشبعاً عالياً بالمياه، مع احتمالية تشكل سيول في الأودية المتجهة نحو المنطقة.</div>
+        <div class="report-tags">
+          <span class="report-tag">تشبع</span>
+          <span class="report-tag">حذر</span>
+        </div>
+        <div class="report-meta">
+          <div class="report-author">
+            <div class="author-avatar">س</div>
+            <span class="author-name">سمر الخطيب</span>
+          </div>
+          <span class="report-time">قبل ٣٥ دقيقة</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card warning">
+      <div class="report-image">
+        <span class="placeholder-icon">⛈</span>
+        <div class="image-overlay">
+          <span class="location-tag">⚲ الطفيلة</span>
+          <span class="severity-badge warning">حذر</span>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="verified-badge">✓ موثّق بالذكاء الاصطناعي</div>
+        <div class="report-title">عاصفة رعدية على الطفيلة</div>
+        <div class="report-desc">عاصفة رعدية قوية تضرب منطقة الطفيلة مع أمطار غزيرة وبرق متواصل. الرؤية ضعيفة على الطرق الجبلية.</div>
+        <div class="report-tags">
+          <span class="report-tag">عاصفة</span>
+          <span class="report-tag">أمطار</span>
+        </div>
+        <div class="report-meta">
+          <div class="report-author">
+            <div class="author-avatar">ع</div>
+            <span class="author-name">عبدالله الرواشدة</span>
+          </div>
+          <span class="report-time">قبل ٤٥ دقيقة</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card safe">
+      <div class="report-image">
+        <span class="placeholder-icon">☀</span>
+        <div class="image-overlay">
+          <span class="location-tag">⚲ العقبة</span>
+          <span class="severity-badge safe">مستقر</span>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="verified-badge">✓ موثّق بالذكاء الاصطناعي</div>
+        <div class="report-title">الأوضاع طبيعية في العقبة</div>
+        <div class="report-desc">الوضع الجوي مستقر في مدينة العقبة، لا توجد أمطار أو أي مؤشرات لخطر سيول. الطرق جميعها مفتوحة وحالة المرور طبيعية.</div>
+        <div class="report-tags">
+          <span class="report-tag">مستقر</span>
+          <span class="report-tag">طقس</span>
+        </div>
+        <div class="report-meta">
+          <div class="report-author">
+            <div class="author-avatar">ر</div>
+            <span class="author-name">رنا الشبيلات</span>
+          </div>
+          <span class="report-time">قبل ٥٠ دقيقة</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card warning">
+      <div class="report-image">
+        <span class="placeholder-icon">🌉</span>
+        <div class="image-overlay">
+          <span class="location-tag">⚲ وادي شعيب — السلط</span>
+          <span class="severity-badge warning">حذر</span>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="verified-badge">✓ موثّق بالذكاء الاصطناعي</div>
+        <div class="report-title">ارتفاع منسوب وادي شعيب</div>
+        <div class="report-desc">بدأ منسوب المياه بالارتفاع في وادي شعيب قرب السلط، الجسر الرئيسي تحت المراقبة. يُنصح بتقليل السرعة على الطريق.</div>
+        <div class="report-tags">
+          <span class="report-tag">سيول</span>
+          <span class="report-tag">جسر</span>
+        </div>
+        <div class="report-meta">
+          <div class="report-author">
+            <div class="author-avatar">ف</div>
+            <span class="author-name">فايز القرالة</span>
+          </div>
+          <span class="report-time">قبل ساعة</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card safe">
+      <div class="report-image">
+        <span class="placeholder-icon">🌤</span>
+        <div class="image-overlay">
+          <span class="location-tag">⚲ الكرك</span>
+          <span class="severity-badge safe">مستقر</span>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="verified-badge">✓ موثّق بالذكاء الاصطناعي</div>
+        <div class="report-title">استقرار الأحوال الجوية في الكرك</div>
+        <div class="report-desc">غيوم متفرقة دون أي أمطار، الوضع عام في محافظة الكرك مستقر. لا توجد تحذيرات نشطة في المنطقة.</div>
+        <div class="report-tags">
+          <span class="report-tag">مستقر</span>
+        </div>
+        <div class="report-meta">
+          <div class="report-author">
+            <div class="author-avatar">ن</div>
+            <span class="author-name">نضال المجالي</span>
+          </div>
+          <span class="report-time">قبل ساعة و١٠ دقائق</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-card danger">
+      <div class="report-image">
+        <span class="placeholder-icon">🚧</span>
+        <div class="image-overlay">
+          <span class="location-tag"> blockers طريق وادي عربة</span>
+          <span class="severity-badge danger">خطر شديد</span>
+        </div>
+      </div>
+      <div class="report-body">
+        <div class="verified-badge">✓ موثّق بالذكاء الاصطناعي</div>
+        <div class="report-title">طريق وادي عربة الجنوبي مغلق تماماً</div>
+        <div class="report-desc">الطريق الرئيسي بين العقبة ومعان مغلق بالكامل بسبب السيول. جميع المركبات متوقفة، فرق الإنقاذ تعمل على إخلاء المواطنين.</div>
+        <div class="report-tags">
+          <span class="report-tag">طريق مغلق</span>
+          <span class="report-tag">إنقاذ</span>
+        </div>
+        <div class="report-meta">
+          <div class="report-author">
+            <div class="author-avatar">ط</div>
+            <span class="author-name">طارق الفايز</span>
+          </div>
+          <span class="report-time">قبل ساعة و٢٠ دقيقة</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

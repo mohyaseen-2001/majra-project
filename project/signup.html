@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إنشاء حساب | مَجرى</title>
+<style>
+:root {
+  --bg-deep: #0b0f19;
+  --bg-card: #111827;
+  --border: #374151;
+  --cyan: #06b6d4;
+  --emerald: #10b981;
+  --amber: #f59e0b;
+  --red: #ef4444;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  padding: 40px 20px;
+}
+a { text-decoration: none; color: inherit; }
+body::before {
+  content: '';
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    linear-gradient(rgba(6,182,212,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+.back-link {
+  position: fixed; top: 24px; right: 32px;
+  font-size: 12px; color: var(--text-muted);
+  transition: color .25s; z-index: 10;
+}
+.back-link:hover { color: var(--cyan); }
+.signup-container {
+  width: 100%; max-width: 480px;
+  padding: 20px;
+  position: relative; z-index: 1;
+}
+.signup-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px 36px;
+  position: relative; overflow: hidden;
+}
+.signup-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--emerald), var(--cyan));
+}
+.signup-logo { text-align: center; margin-bottom: 24px; }
+.signup-logo .icon { font-size: 36px; color: var(--emerald); margin-bottom: 8px; }
+.signup-logo h1 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+.signup-logo p { font-size: 11px; color: var(--text-muted); }
+.info-banner {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 16px;
+  background: rgba(6,182,212,0.06);
+  border: 1px solid rgba(6,182,212,0.15);
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+.info-banner .info-icon { font-size: 16px; color: var(--cyan); flex-shrink: 0; }
+.info-banner p { font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+.form-group { margin-bottom: 20px; }
+.form-group label {
+  display: block; font-size: 12px; font-weight: 600;
+  color: var(--text-secondary); margin-bottom: 8px;
+}
+.input-wrapper { position: relative; }
+.input-wrapper .input-icon {
+  position: absolute; right: 14px; top: 50%;
+  transform: translateY(-50%); font-size: 14px; color: var(--text-muted);
+}
+.form-input {
+  width: 100%; padding: 12px 42px 12px 16px;
+  background: var(--bg-deep); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text-primary);
+  font-size: 13px; font-family: inherit; transition: all .25s;
+}
+.form-input::placeholder { color: var(--text-muted); }
+.form-input:focus { outline: none; border-color: var(--emerald); box-shadow: 0 0 0 3px rgba(16,185,129,0.1); }
+.form-row-double {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.checkbox-wrapper {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-size: 11px; color: var(--text-secondary); cursor: pointer;
+  margin-bottom: 24px; line-height: 1.6;
+}
+.checkbox-wrapper input[type="checkbox"] { accent-color: var(--emerald); margin-top: 2px; }
+.checkbox-wrapper a { color: var(--cyan); }
+.btn-signup {
+  width: 100%; padding: 14px;
+  background: var(--emerald); color: var(--bg-deep);
+  border: none; border-radius: 8px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  transition: all .25s; font-family: inherit;
+  display: block; text-align: center; margin-bottom: 20px;
+}
+.btn-signup:hover { box-shadow: 0 0 24px rgba(16,185,129,0.4); transform: translateY(-1px); }
+.divider { text-align: center; margin: 16px 0; position: relative; }
+.divider::before {
+  content: ''; position: absolute; top: 50%; right: 0; left: 0;
+  height: 1px; background: var(--border);
+}
+.divider span {
+  background: var(--bg-card); padding: 0 12px;
+  font-size: 11px; color: var(--text-muted); position: relative;
+}
+.login-link { text-align: center; font-size: 12px; color: var(--text-secondary); }
+.login-link a { color: var(--cyan); font-weight: 600; transition: color .25s; }
+.login-link a:hover { color: var(--emerald); }
+</style>
+</head>
+<body>
+<a href="index.html" class="back-link">← العودة للرئيسية</a>
+<div class="signup-container">
+  <div class="signup-card">
+    <div class="signup-logo">
+      <div class="icon">◆</div>
+      <h1>إنشاء حساب راصد</h1>
+      <p>انضم إلى شبكة مراقبة السيول في الأردن</p>
+    </div>
+    <div class="info-banner">
+      <span class="info-icon">ℹ</span>
+      <p>بإنشائك حساباً تصبح راصداً معتمداً في منصة مَجرى، وستتمكن من إرسال تقارير السيول والأمطار في منطقتك والمساهمة في حماية المجتمع.</p>
+    </div>
+    <form>
+      <div class="form-group">
+        <label>الاسم الكامل</label>
+        <div class="input-wrapper">
+          <span class="input-icon">☻</span>
+          <input type="text" class="form-input" placeholder="أدخل اسمك الكامل">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉</span>
+          <input type="email" class="form-input" placeholder="example@majra.jo">
+        </div>
+      </div>
+      <div class="form-row-double">
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <div class="input-wrapper">
+            <span class="input-icon">⚿</span>
+            <input type="password" class="form-input" placeholder="••••••••">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>تأكيد كلمة المرور</label>
+          <div class="input-wrapper">
+            <span class="input-icon">⚿</span>
+            <input type="password" class="form-input" placeholder="••••••••">
+          </div>
+        </div>
+      </div>
+      <label class="checkbox-wrapper">
+        <input type="checkbox">
+        <span>أوافق على <a href="about.html">شروط وأحكام المنصة</a> وقواعد الاستخدام وسياسة الخصوصية الخاصة بنظام مَجرى</span>
+      </label>
+      <a href="login.html" class="btn-signup">إنشاء الحساب والتسجيل</a>
+      <div class="divider"><span>أو</span></div>
+      <p class="login-link">لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a></p>
+    </form>
+  </div>
+</div>
+</body>
+</html>
