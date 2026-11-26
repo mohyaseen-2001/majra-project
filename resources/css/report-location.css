@@ -1,0 +1,1 @@
+.location-methods{display:flex;flex-wrap:wrap;gap:9px}.location-button,.map-choice-button{align-self:flex-start;cursor:pointer}.location-button:disabled{opacity:.65;cursor:progress}.map-choice-button{border:1px solid rgba(87,197,207,.34);background:rgba(10,32,47,.78)}.location-choice>small{line-height:1.7}
