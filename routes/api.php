@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDataController;
+use App\Http\Controllers\PublicMapDataController;
 use Illuminate\Support\Facades\Route;
+
+Route::get('weather', [PublicMapDataController::class, 'weather'])->middleware('throttle:30,1');
+Route::get('hospitals', [PublicMapDataController::class, 'hospitals'])->middleware('throttle:10,1');
 
 Route::middleware(['web', 'auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('{resource}', [AdminDataController::class, 'index'])->whereIn('resource', AdminDataController::RESOURCES);

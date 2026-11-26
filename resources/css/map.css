@@ -1,0 +1,10 @@
+.map-data-strip { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:10px; margin:0 0 12px; }
+.weather-card,.hospital-card { display:flex; align-items:center; gap:12px; min-height:72px; padding:12px 14px; border:1px solid var(--line); border-radius:8px; background:linear-gradient(115deg,rgba(16,39,56,.92),rgba(9,24,37,.94)); }
+.weather-symbol { width:36px; height:36px; display:grid; place-items:center; border:1px solid rgba(53,185,233,.25); border-radius:9px; color:var(--blue); background:rgba(53,185,233,.08); font-size:18px; }
+.weather-card > div,.hospital-card > div { min-width:0; flex:1; display:grid; gap:4px; }
+.weather-card small,.hospital-card small { color:#7f98a7; font-size:9px; }
+.weather-card strong,.hospital-card strong { color:#e6f2f7; font-size:11px; }
+.weather-card > div > span { color:#a0b3bf; font-size:9px; }
+.weather-card button:not(.button),.hospital-card button { flex:0 0 auto; border:1px solid rgba(70,188,207,.2); border-radius:5px; padding:7px 9px; background:rgba(48,153,172,.08); color:#a8e8ed; font:inherit; font-size:9px; cursor:pointer; }
+.hospital-card button:disabled { opacity:.55; cursor:wait; }
+@media(max-width:700px) { .map-data-strip { grid-template-columns:1fr; }.weather-card,.hospital-card { align-items:flex-start; flex-wrap:wrap; }.weather-card button,.hospital-card button { margin-inline-start:auto; } }

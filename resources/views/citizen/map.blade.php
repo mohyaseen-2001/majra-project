@@ -7,6 +7,7 @@
         <div class="map-legend" aria-label="مفتاح الخريطة">
             <span><i class="legend-dot danger"></i> خطر مرتفع</span><span><i class="legend-dot caution"></i> تنبيه</span><span><i class="legend-dot closure"></i> إغلاق طريق</span><span class="map-count">{{ $reports->count() }} بلاغاً موثّقاً</span>
         </div>
+        <div class="map-data-strip"><article class="weather-card"><span class="weather-symbol">☂</span><div><small>طقس عمّان · <span id="weather-source">Open-Meteo</span></small><strong id="weather-main">جارٍ جلب آخر تحديث…</strong><span id="weather-extra">إذا تعذّر المصدر ستظهر آخر بيانات محفوظة.</span></div><button type="button" id="weather-refresh">تحديث</button></article><article class="hospital-card"><div><strong>مستشفيات قريبة</strong><small id="hospital-status">مصدر مفتوح من OpenStreetMap وقد تكون بياناته غير مكتملة.</small></div><button type="button" class="button button-small" id="hospitals-load">اعرض حول مركز الخريطة</button></article></div>
         <div id="majra-map" class="leaflet-map" aria-label="خريطة الأردن والبلاغات"></div>
         <div class="citizen-grid map-lower-grid">
             <section class="citizen-card"><div class="card-heading"><span class="card-icon">!</span><div><h2>التنبيهات الحالية</h2><p>المصدر والوقت ظاهرين مع كل تنبيه</p></div></div>
@@ -43,6 +44,25 @@
         };
         majraReports.forEach((entry) => marker(entry, 'report'));
         majraClosures.forEach((entry) => marker(entry, 'closure'));
+        const loadWeather = async () => {
+            const main = document.getElementById('weather-main'); const extra = document.getElementById('weather-extra');
+            try {
+                const {data} = await window.axios.get('/api/weather', {params:{latitude:31.9539, longitude:35.9106}});
+                const current=data.current||{}; main.textContent=`${data.condition} · ${current.temperature_2m ?? '—'}°`; extra.textContent=`احتمال هطول ${data.precipitation_probability ?? '—'}٪ · رطوبة ${current.relative_humidity_2m ?? '—'}٪ · آخر تحديث ${data.updated_at || 'غير معروف'}${data.stale ? ' · بيانات محفوظة' : ''}`;
+                document.getElementById('weather-source').textContent=data.source||'Open-Meteo';
+            } catch { main.textContent='الطقس غير متاح حالياً'; extra.textContent='ستظهر آخر بيانات محفوظة عند توفرها.'; }
+        };
+        document.getElementById('weather-refresh').addEventListener('click',loadWeather); loadWeather();
+        document.getElementById('hospitals-load').addEventListener('click',async(event)=>{
+            const button=event.currentTarget; button.disabled=true; document.getElementById('hospital-status').textContent='جارٍ البحث حول مركز الخريطة…';
+            const center=map.getCenter();
+            try {
+                const {data}=await window.axios.get('/api/hospitals',{params:{latitude:center.lat,longitude:center.lng,radius_km:15}});
+                data.data.forEach((place)=>{const node=document.createElement('div');const name=document.createElement('strong');name.textContent=place.name;node.append(name);if(place.phone){const phone=document.createElement('div');phone.textContent=place.phone;node.append(phone);}L.marker([place.latitude,place.longitude]).addTo(map).bindPopup(node);});
+                document.getElementById('hospital-status').textContent=`${data.data.length} نتيجة · ${data.source} · ${data.stale?'بيانات محفوظة':'تحديث '+data.updated_at}`;
+            } catch { document.getElementById('hospital-status').textContent='تعذر جلب المستشفيات. راجع المصادر الرسمية عند الحاجة.'; }
+            finally { button.disabled=false; }
+        });
         if (navigator.geolocation) {
             const locate = document.createElement('button'); locate.type = 'button'; locate.className = 'map-locate'; locate.textContent = 'موقعي'; locate.setAttribute('aria-label', 'اعرض موقعي مرة واحدة');
             locate.addEventListener('click', () => navigator.geolocation.getCurrentPosition(({coords}) => map.setView([coords.latitude, coords.longitude], 13), () => alert('تعذّر تحديد الموقع. يمكنك متابعة الخريطة يدوياً.')));
