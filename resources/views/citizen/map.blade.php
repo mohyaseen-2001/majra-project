@@ -7,7 +7,7 @@
         <div class="map-legend" aria-label="مفتاح الخريطة">
             <span><i class="legend-dot danger"></i> خطر مرتفع</span><span><i class="legend-dot caution"></i> تنبيه</span><span><i class="legend-dot closure"></i> إغلاق طريق</span><span class="map-count">{{ $reports->count() }} بلاغاً موثّقاً</span>
         </div>
-        <div class="map-data-strip"><article class="weather-card"><span class="weather-symbol">☂</span><div><small>طقس عمّان · <span id="weather-source">Open-Meteo</span></small><strong id="weather-main">جارٍ جلب آخر تحديث…</strong><span id="weather-extra">إذا تعذّر المصدر ستظهر آخر بيانات محفوظة.</span></div><button type="button" id="weather-refresh">تحديث</button></article><article class="hospital-card"><div><strong>مستشفيات قريبة</strong><small id="hospital-status">مصدر مفتوح من OpenStreetMap وقد تكون بياناته غير مكتملة.</small></div><button type="button" class="button button-small" id="hospitals-load">اعرض حول مركز الخريطة</button></article></div>
+        <div class="map-data-strip"><article class="weather-card"><span class="weather-symbol">☂</span><div><small>طقس عمّان · <span id="weather-source">Open-Meteo</span></small><strong id="weather-main">جارٍ جلب آخر تحديث…</strong><span id="weather-extra">إذا تعذّر المصدر ستظهر آخر بيانات محفوظة.</span></div><button type="button" id="weather-refresh">تحديث</button></article><article class="hospital-card"><div><strong>مستشفيات قريبة</strong><small id="hospital-status" role="status" aria-live="polite">مصدر مفتوح من OpenStreetMap وقد تكون بياناته غير مكتملة.</small><small id="location-status" role="status" aria-live="polite"></small></div><button type="button" class="button button-small" id="hospitals-load">اعرض حول مركز الخريطة</button></article></div>
         <div id="majra-map" class="leaflet-map" aria-label="خريطة الأردن والبلاغات"></div>
         <div class="citizen-grid map-lower-grid">
             <section class="citizen-card"><div class="card-heading"><span class="card-icon">!</span><div><h2>التنبيهات الحالية</h2><p>المصدر والوقت ظاهرين مع كل تنبيه</p></div></div>
@@ -65,7 +65,26 @@
         });
         if (navigator.geolocation) {
             const locate = document.createElement('button'); locate.type = 'button'; locate.className = 'map-locate'; locate.textContent = 'موقعي'; locate.setAttribute('aria-label', 'اعرض موقعي مرة واحدة');
-            locate.addEventListener('click', () => navigator.geolocation.getCurrentPosition(({coords}) => map.setView([coords.latitude, coords.longitude], 13), () => alert('تعذّر تحديد الموقع. يمكنك متابعة الخريطة يدوياً.')));
+            locate.addEventListener('click', () => {
+                const status = document.getElementById('location-status');
+                locate.disabled = true;
+                locate.textContent = 'جارٍ تحديد الموقع…';
+                status.textContent = 'انتظر لحظة حتى يحدد المتصفح موقعك.';
+                navigator.geolocation.getCurrentPosition(({coords}) => {
+                    locate.disabled = false;
+                    locate.textContent = 'موقعي';
+                    map.setView([coords.latitude, coords.longitude], 13);
+                    status.textContent = 'تم تحديد موقعك. اضغط «اعرض حول مركز الخريطة» لعرض المستشفيات القريبة.';
+                }, (error) => {
+                    locate.disabled = false;
+                    locate.textContent = 'موقعي';
+                    status.textContent = error.code === 1
+                        ? 'المتصفح منع الوصول للموقع. اسمح به لهذا الموقع من إعدادات المتصفح ثم أعد المحاولة.'
+                        : error.code === 3
+                            ? 'انتهت مهلة تحديد الموقع. تأكد من تفعيل خدمات الموقع في الجهاز ثم أعد المحاولة.'
+                            : 'تعذر الحصول على موقع الجهاز. تحقق من خدمات الموقع أو تابع باستخدام الخريطة يدويًا.';
+                }, {enableHighAccuracy: false, maximumAge: 30000, timeout: 20000});
+            });
             document.querySelector('#majra-map').append(locate);
         }
     </script>

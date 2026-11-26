@@ -22,4 +22,16 @@ class CitizenReportLocationTest extends TestCase
             ->assertSee('navigator.geolocation.getCurrentPosition')
             ->assertSee('maximumAge: 30000');
     }
+
+    public function test_map_shows_actionable_feedback_when_location_access_fails(): void
+    {
+        $citizen = User::factory()->create(['role' => 'citizen']);
+
+        $this->actingAs($citizen)
+            ->get('/map')
+            ->assertOk()
+            ->assertSee('المتصفح منع الوصول للموقع')
+            ->assertSee('تأكد من تفعيل خدمات الموقع في الجهاز')
+            ->assertSee('role="status" aria-live="polite"', false);
+    }
 }
