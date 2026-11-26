@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\Citizen\ReportController;
 use App\Http\Controllers\Admin\AdminPageController;
+use App\Http\Controllers\Company\CompanyPortalController;
+use App\Http\Controllers\Company\CheckoutController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,9 +22,18 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware('auth')->name('dashboard');
 
-Route::view('/company/dashboard', 'dashboard')
-    ->middleware(['auth', 'role:company'])
-    ->name('company.dashboard');
+Route::middleware(['auth', 'role:company'])->prefix('company')->name('company.')->group(function () {
+    Route::get('/dashboard', [CompanyPortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/areas', [CompanyPortalController::class, 'areas'])->name('areas');
+    Route::post('/areas', [CompanyPortalController::class, 'storeArea'])->name('areas.store');
+    Route::delete('/areas/{area}', [CompanyPortalController::class, 'destroyArea'])->name('areas.destroy');
+    Route::get('/reports', [CompanyPortalController::class, 'reports'])->name('reports');
+    Route::get('/subscription', [CompanyPortalController::class, 'subscription'])->name('subscription');
+    Route::post('/checkout', [CheckoutController::class, 'start'])->name('checkout');
+});
+Route::view('/checkout', 'pages.checkout')->name('checkout');
+Route::view('/payment/success', 'pages.payment-success')->name('payment.success');
+Route::view('/payment/cancel', 'pages.payment-cancel')->name('payment.cancel');
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminPageController::class, 'dashboard'])->name('dashboard');

@@ -3,6 +3,8 @@
     <div class="ops-nav-links">
         @if(Auth::user()->hasRole('citizen'))
             <a href="{{ route('map') }}">الخريطة</a><a href="{{ route('feed') }}">البلاغات</a><a href="{{ route('reports.create') }}">أرسل بلاغاً</a>
+        @elseif(Auth::user()->hasRole('company'))
+            <a href="{{ route('company.dashboard') }}">لوحة الشركة</a><a href="{{ route('company.areas') }}">مناطقي</a><a href="{{ route('company.reports') }}">التقارير</a><a href="{{ route('company.subscription') }}">الاشتراك</a>
         @else
             <a href="{{ Auth::user()->hasRole('admin') ? route('admin.dashboard') : route('company.dashboard') }}">لوحة المتابعة</a>
         @endif
