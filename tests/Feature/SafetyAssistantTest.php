@@ -20,4 +20,11 @@ class SafetyAssistantTest extends TestCase
             ->assertOk()
             ->assertJsonMissingPath('urgent');
     }
+
+    public function test_emergency_numbers_question_returns_the_listed_numbers(): void
+    {
+        $this->postJson('/api/safety-assistant', ['question' => 'ما رقم الطوارئ؟'])
+            ->assertOk()
+            ->assertJsonFragment(['answer' => 'رقم الطوارئ الموحد في الأردن 911. تذكر بوابة الأردن أيضاً الإسعاف 193 والإطفاء 199. عند خطر مباشر اتصل بـ911 واتبع تعليمات المستجيب.']);
+    }
 }

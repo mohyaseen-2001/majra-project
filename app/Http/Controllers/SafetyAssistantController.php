@@ -12,10 +12,10 @@ class SafetyAssistantController extends Controller
         $data = $request->validate(['question' => ['required', 'string', 'max:500']]);
         $question = mb_strtolower($data['question']);
 
-        if (preg_match('/خطر مباشر|في خطر|عالق|غريق|إصابة|مصاب|انجراف|طوارئ|محاصر|حادث/u', $question)) {
+        if (preg_match('/خطر مباشر|في خطر|عالق|غريق|إصابة|مصاب|انجراف|محاصر|حادث/u', $question)) {
             return response()->json(['answer' => 'إذا كان هناك خطر مباشر، ابتعد إلى مكان آمن واتصل برقم الطوارئ الموحد 911 فوراً. لا تدخل المياه ولا تحاول إنقاذ أحد بنفسك إذا كان ذلك يعرّضك للخطر.', 'source' => 'مديرية الأمن العام الأردنية', 'urgent' => true]);
         }
-        if (preg_match('/رقم|طوارئ|إسعاف|اسعاف|دفاع مدني|إطفاء|اطفاء/u', $question)) {
+        if (preg_match('/رقم|أرقام|طوارئ|إسعاف|اسعاف|دفاع مدني|إطفاء|اطفاء/u', $question)) {
             return response()->json(['answer' => 'رقم الطوارئ الموحد في الأردن 911. تذكر بوابة الأردن أيضاً الإسعاف 193 والإطفاء 199. عند خطر مباشر اتصل بـ911 واتبع تعليمات المستجيب.', 'source' => 'بوابة الأردن الرسمية', 'urgent' => true]);
         }
         if (preg_match('/لون|ألوان|الوان|الخريطة|مستوى الخطر/u', $question)) {
