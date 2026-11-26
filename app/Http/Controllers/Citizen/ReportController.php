@@ -1,0 +1,103 @@
+<?php
+
+namespace App\Http\Controllers\Citizen;
+
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreReportRequest;
+use App\Models\Alert;
+use App\Models\Report;
+use App\Models\RoadClosure;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
+class ReportController extends Controller
+{
+    public function map(): View
+    {
+        $reports = Report::query()->whereIn('status', ['approved', 'resolved'])
+            ->with('media')->latest()->limit(300)->get();
+
+        return view('citizen.map', [
+            'reports' => $reports,
+            'closures' => RoadClosure::query()->where('status', 'active')->where(function ($query) {
+                $query->whereNull('ends_at')->orWhere('ends_at', '>', now());
+            })->get(),
+            'alerts' => Alert::query()->where('is_active', true)->where(function ($query) {
+                $query->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })->latest('published_at')->limit(20)->get(),
+        ]);
+    }
+
+    public function index(): View
+    {
+        $reports = Report::query()->whereIn('status', ['approved', 'resolved'])
+            ->with(['user:id,name', 'media'])->latest()->paginate(12);
+
+        return view('citizen.feed', compact('reports'));
+    }
+
+    public function create(): View
+    {
+        return view('citizen.reports.create');
+    }
+
+    public function store(StoreReportRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+        $photo = $validated['photo'];
+        $path = $photo->store('reports', 'public');
+
+        try {
+            $report = DB::transaction(function () use ($validated, $photo, $path, $request) {
+                $report = Report::create([
+                    'public_id' => (string) Str::uuid(),
+                    'user_id' => $request->user()->id,
+                    'title' => $validated['title'],
+                    'description' => $validated['description'],
+                    'hazard_type' => 'flood',
+                    'risk_level' => 'unknown',
+                    'status' => 'pending',
+                    'source' => 'citizen',
+                    'area_name' => $validated['area_name'],
+                    'latitude' => $validated['latitude'],
+                    'longitude' => $validated['longitude'],
+                    'expires_at' => now()->addHours(24),
+                ]);
+
+                $report->media()->create([
+                    'disk' => 'public',
+                    'path' => $path,
+                    'mime_type' => $photo->getMimeType(),
+                    'size_bytes' => $photo->getSize(),
+                    'sha256' => hash_file('sha256', $photo->getRealPath()),
+                    'position' => 0,
+                ]);
+
+                return $report;
+            });
+        } catch (\Throwable $exception) {
+            Storage::disk('public')->delete($path);
+            throw $exception;
+        }
+
+        return redirect()->route('reports.show', $report->public_id)
+            ->with('success', 'وصل بلاغك إلى فريق المراجعة. سيظهر على الخريطة بعد التحقق منه.');
+    }
+
+    public function show(Report $report): View
+    {
+        abort_unless(
+            in_array($report->status, ['approved', 'resolved'], true)
+            || $report->user_id === auth()->id()
+            || auth()->user()?->hasRole('admin'),
+            404,
+        );
+
+        return view('citizen.reports.show', [
+            'report' => $report->load(['user:id,name', 'media', 'aiAnalyses' => fn ($query) => $query->latest()->limit(1)]),
+        ]);
+    }
+}
