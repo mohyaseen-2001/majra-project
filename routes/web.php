@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\Citizen\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,10 +9,11 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::view('/about', 'pages.about')->name('about');
-Route::view('/safety', 'pages.safety')->name('safety');
-Route::view('/pricing', 'pages.pricing')->name('pricing');
-Route::view('/contact', 'pages.contact')->name('contact');
+Route::get('/about', [PublicPageController::class, 'about'])->name('about');
+Route::get('/safety', [PublicPageController::class, 'safety'])->name('safety');
+Route::get('/pricing', [PublicPageController::class, 'pricing'])->name('pricing');
+Route::get('/contact', [PublicPageController::class, 'contact'])->name('contact');
+Route::post('/contact', [PublicPageController::class, 'storeContact'])->middleware('throttle:5,1')->name('contact.store');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
