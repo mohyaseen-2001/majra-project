@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\Citizen\ReportController;
+use App\Http\Controllers\Admin\AdminPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -23,9 +24,10 @@ Route::view('/company/dashboard', 'dashboard')
     ->middleware(['auth', 'role:company'])
     ->name('company.dashboard');
 
-Route::view('/admin/dashboard', 'dashboard')
-    ->middleware(['auth', 'role:admin'])
-    ->name('admin.dashboard');
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminPageController::class, 'dashboard'])->name('dashboard');
+    Route::get('/{section}', [AdminPageController::class, 'section'])->whereIn('section', AdminPageController::SECTIONS)->name('section');
+});
 
 
 Route::middleware('auth')->group(function () {

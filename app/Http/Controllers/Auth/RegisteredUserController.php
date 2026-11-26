@@ -50,7 +50,7 @@ class RegisteredUserController extends Controller
 
         $destination = $user->role === 'company'
             ? route('company.dashboard', absolute: false)
-            : route('dashboard', absolute: false);
+            : route('map', absolute: false);
 
         return redirect($destination);
     }
