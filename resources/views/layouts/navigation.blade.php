@@ -1,0 +1,7 @@
+<nav class="ops-nav">
+    <a class="brand" href="{{ route('home') }}"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span>مَجرى<small>غرفة عمليات السيول</small></span></a>
+    <div class="ops-nav-links"><a href="{{ route('dashboard') }}">نظرة عامة</a><a href="{{ route('profile.edit') }}">الملف الشخصي</a></div>
+    <div class="ops-user"><span>{{ Auth::user()->name }}</span>
+        <form method="POST" action="{{ route('logout') }}">@csrf<button class="ops-logout" type="submit">تسجيل الخروج</button></form>
+    </div>
+</nav>
