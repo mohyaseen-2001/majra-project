@@ -4,7 +4,7 @@
         <span class="status-pill"><span class="live-dot"></span> مرحلة التأسيس</span>
     </div>
     <div class="ops-stats">
-        <div class="ops-stat"><span>حالة الدخول</span><strong>جلسة آمنة</strong></div>
+        <div class="ops-stat"><span>نوع الحساب</span><strong>{{ auth()->user()->role === 'admin' ? 'إدارة النظام' : (auth()->user()->role === 'company' ? 'حساب شركة' : 'مواطن') }}</strong></div>
         <div class="ops-stat"><span>حالة الحساب</span><strong><i>●</i> مفعّل</strong></div>
         <div class="ops-stat"><span>المنطقة الزمنية</span><strong>عمّان · الأردن</strong></div>
     </div>
