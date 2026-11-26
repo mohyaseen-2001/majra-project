@@ -41,7 +41,7 @@ class AdminDataController extends Controller
 
     public function index(Request $request, string $resource): JsonResponse
     {
-        $this->authorizeResource($resource, 'viewAny');
+        $this->authorizeMajraResource($resource, 'viewAny');
         [$model, $relations, $searchable] = self::CONFIG[$resource];
         $query = $model::query()->with($relations)->latest();
 
@@ -71,14 +71,14 @@ class AdminDataController extends Controller
     {
         [$model, $relations] = self::CONFIG[$resource];
         $item = $model::with($relations)->findOrFail($record);
-        $this->authorizeResource($resource, 'view', $item);
+        $this->authorizeMajraResource($resource, 'view', $item);
 
         return response()->json(['data' => $item]);
     }
 
     public function store(Request $request, string $resource): JsonResponse
     {
-        $this->authorizeResource($resource, 'create');
+        $this->authorizeMajraResource($resource, 'create');
         $validated = $request->validate($this->rules($resource, true));
         [$model] = self::CONFIG[$resource];
 
@@ -101,7 +101,7 @@ class AdminDataController extends Controller
     {
         [$model] = self::CONFIG[$resource];
         $item = $model::findOrFail($record);
-        $this->authorizeResource($resource, 'update', $item);
+        $this->authorizeMajraResource($resource, 'update', $item);
         $validated = $request->validate($this->rules($resource, false));
         $previousStatus = $resource === 'reports' ? $item->status : null;
         $previousFalseFlag = $resource === 'reports' ? (bool) $item->is_false_report : false;
@@ -149,7 +149,7 @@ class AdminDataController extends Controller
     {
         [$model] = self::CONFIG[$resource];
         $item = $model::findOrFail($record);
-        $this->authorizeResource($resource, 'delete', $item);
+        $this->authorizeMajraResource($resource, 'delete', $item);
 
         if ($resource === 'users' && ($item->id === $request->user()->id || $item->role === 'admin')) {
             return response()->json(['message' => 'لا يمكن حذف حساب الأدمن الحالي أو حساب أدمن آخر من هذه الشاشة.'], Response::HTTP_CONFLICT);
@@ -178,7 +178,7 @@ class AdminDataController extends Controller
         return response()->json(['message' => 'تم الحذف.']);
     }
 
-    private function authorizeResource(string $resource, string $ability, mixed $item = null): void
+    private function authorizeMajraResource(string $resource, string $ability, mixed $item = null): void
     {
         if ($resource === 'reports') {
             $this->authorize($ability, $item ?? Report::class);
