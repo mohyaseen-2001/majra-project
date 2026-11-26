@@ -1,0 +1,1 @@
+.service-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.service-grid i.service-ready{background:#63a8ff;box-shadow:0 0 8px #63a8ff66}@media(max-width:900px){.service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.service-grid{grid-template-columns:1fr}}
