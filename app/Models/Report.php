@@ -15,7 +15,7 @@ class Report extends Model
 
     protected $fillable = [
         'public_id', 'user_id', 'reviewed_by', 'title', 'description', 'hazard_type', 'risk_level',
-        'status', 'source', 'area_name', 'latitude', 'longitude', 'ai_checked_at', 'reviewed_at',
+        'status', 'is_false_report', 'source', 'area_name', 'latitude', 'longitude', 'ai_checked_at', 'reviewed_at',
         'expires_at', 'resolved_at',
     ];
 
@@ -28,6 +28,7 @@ class Report extends Model
             'reviewed_at' => 'datetime',
             'expires_at' => 'datetime',
             'resolved_at' => 'datetime',
+            'is_false_report' => 'boolean',
         ];
     }
 
@@ -43,4 +44,5 @@ class Report extends Model
     public function media(): HasMany { return $this->hasMany(ReportMedia::class)->orderBy('position'); }
     public function aiAnalyses(): HasMany { return $this->hasMany(AiAnalysis::class); }
     public function reliabilityTransactions(): HasMany { return $this->hasMany(ReliabilityTransaction::class); }
+    public function confirmations(): HasMany { return $this->hasMany(ReportConfirmation::class); }
 }

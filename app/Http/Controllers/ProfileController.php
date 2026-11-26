@@ -18,6 +18,9 @@ class ProfileController extends Controller
     {
         return view('profile.edit', [
             'user' => $request->user(),
+            'approvedReportCount' => $request->user()->reports()->where('status', 'approved')->count(),
+            'recentPointTransactions' => $request->user()->reliabilityTransactions()->latest()->limit(8)->get(),
+            'earnedBadges' => $request->user()->badges()->orderByPivot('earned_at', 'desc')->get(),
         ]);
     }
 

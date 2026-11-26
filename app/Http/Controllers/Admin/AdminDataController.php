@@ -12,15 +12,19 @@ use App\Models\RoadClosure;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Services\ReliabilityPointsService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class AdminDataController extends Controller
 {
+    public function __construct(private ReliabilityPointsService $points) {}
+
     public const RESOURCES = ['reports', 'road-closures', 'alerts', 'users', 'companies', 'subscriptions', 'payments', 'contacts', 'subscription-plans'];
 
     private const CONFIG = [
@@ -99,6 +103,14 @@ class AdminDataController extends Controller
         $item = $model::findOrFail($record);
         $this->authorizeResource($resource, 'update', $item);
         $validated = $request->validate($this->rules($resource, false));
+        $previousStatus = $resource === 'reports' ? $item->status : null;
+        $previousFalseFlag = $resource === 'reports' ? (bool) $item->is_false_report : false;
+        $nextStatus = $validated['status'] ?? $previousStatus;
+        $nextFalseFlag = (bool) ($validated['is_false_report'] ?? $previousFalseFlag);
+
+        if ($resource === 'reports' && $nextFalseFlag && $nextStatus !== 'rejected') {
+            throw ValidationException::withMessages(['is_false_report' => 'لا يمكن تسجيل البلاغ الكاذب إلا مع قرار الرفض.']);
+        }
 
         if ($resource === 'users' && $item->id === $request->user()->id) {
             unset($validated['role'], $validated['is_suspended']);
@@ -122,6 +134,13 @@ class AdminDataController extends Controller
         }
 
         $item->update($validated);
+
+        if ($resource === 'reports' && $nextFalseFlag && ! $previousFalseFlag) {
+            $this->points->flagFalseReport($item);
+        }
+        if ($resource === 'reports' && $nextStatus === 'approved' && $previousStatus !== 'approved') {
+            $this->points->awardForApprovedReport($item->refresh());
+        }
 
         return response()->json(['data' => $item->refresh()]);
     }
@@ -177,6 +196,7 @@ class AdminDataController extends Controller
                 'status' => [$presence, Rule::in(Report::STATUSES)], 'area_name' => [$presence, 'string', 'max:120'],
                 'latitude' => [$presence, 'numeric', 'between:29,33.5'], 'longitude' => [$presence, 'numeric', 'between:34.8,39.4'],
                 'admin_note' => ['nullable', 'string', 'max:2000'],
+                'is_false_report' => [$creating ? 'prohibited' : 'sometimes', 'boolean'],
             ],
             'road-closures' => [
                 'title' => [$presence, 'string', 'max:140'], 'description' => ['nullable', 'string', 'max:2000'], 'area_name' => [$presence, 'string', 'max:120'],

@@ -56,13 +56,14 @@ if (body) {
             if (report.media?.[0]) { photo.src = `/storage/${encodeURI(report.media[0].path)}`; photo.hidden = false; } else { photo.hidden = true; }
             const analysis = report.ai_analyses?.[0]; document.getElementById('drawer-ai').textContent = analysis ? `${analysis.is_flood === null ? 'لم يُحسم نوع المشهد' : (analysis.is_flood ? 'يرجّح وجود سيول' : 'لا يرجّح وجود سيول')} · خطر ${analysis.risk_level || 'غير محدد'} · ثقة ${analysis.confidence ?? '—'}` : 'لم يُجرَ الفحص بعد.';
             document.getElementById('drawer-note').value = analysis?.admin_notes || '';
+            document.getElementById('drawer-false-report').checked = Boolean(report.is_false_report);
             drawer.classList.add('open'); backdrop.classList.add('open'); drawer.setAttribute('aria-hidden', 'false');
         } catch (error) { notify(error.response?.data?.message || 'تعذر فتح تفاصيل البلاغ.', true); }
     };
     const close = () => { drawer.classList.remove('open'); backdrop.classList.remove('open'); drawer.setAttribute('aria-hidden', 'true'); };
     const review = async (status) => {
         if (!state.reportId) return;
-        try { await axios.patch(`/api/admin/reports/${state.reportId}`, { status, admin_note: document.getElementById('drawer-note').value }); notify(status === 'approved' ? 'تم اعتماد البلاغ.' : 'تم رفض البلاغ.'); close(); load(); }
+        try { await axios.patch(`/api/admin/reports/${state.reportId}`, { status, admin_note: document.getElementById('drawer-note').value, is_false_report: status === 'rejected' && document.getElementById('drawer-false-report').checked }); notify(status === 'approved' ? 'تم اعتماد البلاغ وإضافة نقاطه.' : 'تم رفض البلاغ.'); close(); load(); }
         catch (error) { notify(error.response?.data?.message || 'تعذر حفظ القرار.', true); }
     };
 

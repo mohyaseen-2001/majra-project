@@ -7,7 +7,9 @@ use App\Http\Requests\StoreReportRequest;
 use App\Models\Alert;
 use App\Models\Report;
 use App\Models\RoadClosure;
+use App\Services\GeminiFloodAnalyzer;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -44,7 +46,7 @@ class ReportController extends Controller
         return view('citizen.reports.create');
     }
 
-    public function store(StoreReportRequest $request): RedirectResponse
+    public function store(StoreReportRequest $request, GeminiFloodAnalyzer $analyzer): RedirectResponse
     {
         $validated = $request->validated();
         $photo = $validated['photo'];
@@ -83,6 +85,8 @@ class ReportController extends Controller
             throw $exception;
         }
 
+        $analyzer->analyze($report);
+
         return redirect()->route('reports.show', $report->public_id)
             ->with('success', 'وصل بلاغك إلى فريق المراجعة. سيظهر على الخريطة بعد التحقق منه.');
     }
@@ -97,7 +101,27 @@ class ReportController extends Controller
         );
 
         return view('citizen.reports.show', [
-            'report' => $report->load(['user:id,name', 'media', 'aiAnalyses' => fn ($query) => $query->latest()->limit(1)]),
+            'report' => $report->load(['user:id,name', 'media', 'aiAnalyses' => fn ($query) => $query->latest()->limit(1)])
+                ->loadCount(['confirmations as still_present_count' => fn ($query) => $query->where('choice', 'still_present'), 'confirmations as ended_count' => fn ($query) => $query->where('choice', 'ended')]),
+            'myConfirmation' => $report->confirmations()->where('user_id', auth()->id())->value('choice'),
         ]);
+    }
+
+    public function confirm(Request $request, Report $report): RedirectResponse
+    {
+        abort_unless($request->user()->hasRole('citizen'), 403);
+        abort_unless($report->status === 'approved' && (! $report->expires_at || $report->expires_at->isFuture()), 404);
+
+        $validated = $request->validate(['choice' => ['required', 'in:still_present,ended']]);
+        $report->confirmations()->updateOrCreate(
+            ['user_id' => $request->user()->id],
+            ['choice' => $validated['choice']],
+        );
+
+        if ($validated['choice'] === 'ended' && $report->confirmations()->where('choice', 'ended')->count() >= 3) {
+            $report->update(['status' => 'resolved', 'resolved_at' => now()]);
+        }
+
+        return back()->with('success', 'تم تسجيل تأكيدك، شكراً للمساعدة في تحديث حالة الطريق.');
     }
 }
