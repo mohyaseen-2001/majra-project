@@ -64,15 +64,20 @@ class CompanyPortalController extends Controller
     public function reports(Request $request): View
     {
         $names = $this->company($request)->areas()->pluck('area_name');
+        $filters = $request->validate([
+            'risk_level' => ['nullable', 'in:low,medium,high,critical,unknown'],
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date', 'after_or_equal:from'],
+        ]);
         $query = Report::query()->whereIn('status', ['approved', 'resolved'])->whereIn('area_name', $names);
-        if ($request->filled('risk_level')) {
-            $query->where('risk_level', $request->string('risk_level'));
+        if (! empty($filters['risk_level'])) {
+            $query->where('risk_level', $filters['risk_level']);
         }
-        if ($request->filled('from')) {
-            $query->whereDate('created_at', '>=', $request->date('from'));
+        if (! empty($filters['from'])) {
+            $query->whereDate('created_at', '>=', $filters['from']);
         }
-        if ($request->filled('to')) {
-            $query->whereDate('created_at', '<=', $request->date('to'));
+        if (! empty($filters['to'])) {
+            $query->whereDate('created_at', '<=', $filters['to']);
         }
         $reports = $query->with('media')->latest()->paginate(15)->withQueryString();
         $closures = RoadClosure::query()->whereIn('area_name', $names)->latest()->limit(30)->get();

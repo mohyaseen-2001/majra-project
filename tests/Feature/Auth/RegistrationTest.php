@@ -23,9 +23,25 @@ class RegistrationTest extends TestCase
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'role' => 'citizen',
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $response->assertRedirect(route('map', absolute: false));
+    }
+
+    public function test_company_registration_creates_company_profile(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'شركة اختبار',
+            'email' => 'company@example.com',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'role' => 'company',
+        ]);
+
+        $this->assertAuthenticated();
+        $response->assertRedirect(route('company.dashboard', absolute: false));
+        $this->assertDatabaseHas('companies', ['name' => 'شركة اختبار', 'status' => 'active']);
     }
 }
