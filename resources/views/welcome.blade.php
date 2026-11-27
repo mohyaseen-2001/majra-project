@@ -14,20 +14,7 @@
 </head>
 <body class="majra-site">
     <div class="site-noise" aria-hidden="true"></div>
-    <header class="site-header">
-        <a class="brand" href="{{ route('home') }}" aria-label="مَجرى — الرئيسية">
-            <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
-            <span>مَجرى<small>غرفة عمليات السيول</small></span>
-        </a>
-        <nav class="site-nav" aria-label="التنقل الرئيسي">
-            <a href="{{ auth()->check() ? (auth()->user()->hasRole('citizen') ? route('map') : (auth()->user()->hasRole('company') ? route('company.dashboard') : route('admin.dashboard'))) : route('login') }}">{{ auth()->check() && auth()->user()->hasRole('company') ? 'لوحة الشركة' : (auth()->check() && auth()->user()->hasRole('admin') ? 'لوحة الإدارة' : 'الخريطة') }}</a>
-            <a href="{{ route('safety') }}">دليل السلامة</a>
-            <a href="{{ route('pricing') }}">للشركات</a>
-            <a href="{{ route('login') }}">تسجيل الدخول</a>
-            <a class="button button-small" href="{{ route('register') }}">إنشاء حساب <span aria-hidden="true">↗</span></a>
-        </nav>
-        <a class="mobile-login" href="{{ route('login') }}">دخول</a>
-    </header>
+    @include('layouts.public-header')
 
     <main>
         <section class="hero-section" aria-labelledby="hero-title">
@@ -36,7 +23,7 @@
                 <h1 id="hero-title">اعرف الخطر<br><em>قبل ما يصير بطريقك</em></h1>
                 <p class="hero-lede">صورة أوضح عن السيول وإغلاقات الطرق — تجمع البلاغات والتنبيهات في مكان واحد، لتوصل المعلومة للناس وقت ما تفرق.</p>
                 <div class="hero-actions">
-                    <a class="button" href="{{ auth()->check() ? (auth()->user()->hasRole('citizen') ? route('map') : (auth()->user()->hasRole('company') ? route('company.dashboard') : route('admin.dashboard'))) : route('login') }}">{{ auth()->check() && auth()->user()->hasRole('citizen') ? 'افتح الخريطة' : 'سجّل الدخول' }} <span aria-hidden="true">←</span></a>
+                    <a class="button" href="{{ auth()->check() ? (auth()->user()->hasRole('citizen') ? route('map') : (auth()->user()->hasRole('company') ? route('company.dashboard') : route('admin.dashboard'))) : route('login') }}">{{ auth()->check() && auth()->user()->hasRole('citizen') ? 'افتح الخريطة' : (auth()->check() ? 'لوحة المتابعة' : 'سجّل الدخول') }} <span aria-hidden="true">←</span></a>
                     <a class="text-link" href="#how-it-works">اكتشف الفكرة <span aria-hidden="true">↓</span></a>
                 </div>
                 <div class="hero-note"><span class="note-icon" aria-hidden="true">⌖</span><span>ما بنتتبع موقعك بالخلفية.<br><b>موقعك إلك — بتشاركه بإذنك.</b></span></div>
@@ -73,7 +60,7 @@
         <section class="mission-strip" id="how-it-works">
             <div class="strip-label"><span>01</span><div><small>الفكرة</small><strong>من المعلومة إلى قرار أوضح</strong></div></div>
             <p>بلاغات المواطنين، فحص الصورة بالذكاء الاصطناعي، ومراجعة بشرية — ضمن مسار واحد يوضح مصدر كل معلومة.</p>
-            <a href="{{ route('register') }}" aria-label="إنشاء حساب في مَجرى">←</a>
+            <a href="{{ auth()->check() ? route('dashboard') : route('register') }}" aria-label="مَجرى">←</a>
         </section>
 
         <section class="roles-section" id="for-who">

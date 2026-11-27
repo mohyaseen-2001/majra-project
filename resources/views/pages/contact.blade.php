@@ -12,19 +12,8 @@
 <body>
     <div class="majra-site">
         <div class="site-noise"></div>
-        <header class="site-header">
-            <a class="brand" href="{{ route('home') }}">
-                <span class="brand-mark"><span></span><span></span><span></span></span>
-                <span>مَجرى<small>غرفة عمليات السيول</small></span>
-            </a>
-            <nav class="site-nav">
-                <a href="{{ route('about') }}">عن مَجرى</a>
-                <a href="{{ route('safety') }}">دليل السلامة</a>
-                <a href="{{ route('pricing') }}">للشركات</a>
-                <a href="{{ route('contact') }}">تواصل معنا</a>
-            </nav>
-            <a class="mobile-login" href="{{ route('login') }}">دخول</a>
-        </header>
+        @include('layouts.public-header')
+
 
         <main class="citizen-page public-page">
             <span class="eyebrow">فريق مَجرى</span>
