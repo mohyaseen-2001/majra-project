@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Models\Report;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -29,5 +30,18 @@ class AdminReportsPageTest extends TestCase
             ->getJson('/api/admin/reports')
             ->assertOk()
             ->assertJsonStructure(['data', 'meta' => ['current_page', 'last_page', 'total']]);
+    }
+
+    public function test_admin_can_delete_a_report_from_the_report_api(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $report = Report::factory()->create();
+
+        $this->actingAs($admin)
+            ->deleteJson('/api/admin/reports/'.$report->id)
+            ->assertOk()
+            ->assertJsonPath('message', 'تم الحذف.');
+
+        $this->assertDatabaseMissing('reports', ['id' => $report->id]);
     }
 }

@@ -38,7 +38,20 @@ if (body) {
                 cell(row, ({critical:'حرج',high:'مرتفع',medium:'متوسط',low:'منخفض',unknown:'غير محدد'})[report.risk_level] || report.risk_level, `risk-text risk-${report.risk_level}`);
                 cell(row, labels[report.status] || report.status, `status-${report.status}`);
                 cell(row, new Date(report.created_at).toLocaleString('ar-JO', { dateStyle: 'medium', timeStyle: 'short' }));
-                const action = document.createElement('td'); const button = document.createElement('button'); button.className = 'row-action'; button.type = 'button'; button.textContent = 'تفاصيل'; action.append(button); row.append(action);
+                const action = document.createElement('td'); action.className = 'table-actions';
+                const button = document.createElement('button'); button.className = 'row-action'; button.type = 'button'; button.textContent = 'تفاصيل'; action.append(button);
+                const remove = document.createElement('button'); remove.className = 'row-action row-delete'; remove.type = 'button'; remove.textContent = 'حذف'; remove.setAttribute('aria-label', `حذف البلاغ ${report.title}`);
+                remove.addEventListener('click', async (event) => {
+                    event.preventDefault(); event.stopPropagation();
+                    if (!window.confirm(`حذف البلاغ «${report.title}» نهائيًا؟`)) return;
+                    try {
+                        await axios.delete(`/api/admin/reports/${report.id}`);
+                        notify('تم حذف البلاغ ومرفقاته.');
+                        if (body.children.length === 1 && state.page > 1) state.page--;
+                        load();
+                    } catch (error) { notify(error.response?.data?.message || 'تعذر حذف البلاغ.', true); }
+                });
+                action.append(remove); row.append(action);
                 row.addEventListener('click', () => open(report.id));
                 row.addEventListener('keydown', (event) => { if (event.key === 'Enter') open(report.id); });
                 body.append(row);
