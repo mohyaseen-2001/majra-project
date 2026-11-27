@@ -36,7 +36,7 @@ class ReportController extends Controller
     public function index(): View
     {
         $reports = Report::query()->whereIn('status', ['approved', 'resolved'])
-            ->with(['user:id,name', 'media'])->latest()->paginate(12);
+            ->with(['user:id,name', 'media'])->latest()->paginate(5);
 
         return view('citizen.feed', compact('reports'));
     }

@@ -39,14 +39,28 @@ if (rows && window.majraAdminResource) {
             if (selectValues[type]) { input=document.createElement('select'); selectValues[type].forEach(([value,text])=>{const option=document.createElement('option');option.value=value;option.textContent=text;input.append(option);}); }
             else if (type==='boolean') { input=document.createElement('input'); input.type='checkbox'; }
             else if (type==='textarea'||type==='lines') { input=document.createElement('textarea'); input.rows=type==='lines'?3:4; }
-            else { input=document.createElement('input'); input.type=type; }
+            else { input=document.createElement('input'); input.type=type.startsWith('company-') ? ({'company-name':'text','company-registration':'text','company-business':'text','company-phone':'tel','company-website':'url'}[type]) : type; }
             input.name=key; input.dataset.type=type; input.required=Boolean(required && (key!=='password'||!item));
+            if (type.startsWith('company-') && config.section === 'users') {
+                wrapper.dataset.companyOnly = 'true';
+                wrapper.dataset.requiredForCompany = String(Boolean(required));
+            }
             let value=item?.[key] ?? '';
             if(type==='lines') value=Array.isArray(value)?value.join('\n'):value;
             if(type==='datetime-local'&&value) value=new Date(value).toISOString().slice(0,16);
             if(type==='boolean') input.checked=Boolean(value); else if(value!==null) input.value=value;
             wrapper.append(input); fieldBox.append(wrapper);
         });
+        if (config.section === 'users') {
+            const role = fieldBox.querySelector('[name="role"]');
+            const syncCompanyFields = () => fieldBox.querySelectorAll('[data-company-only]').forEach((wrapper) => {
+                const visible = role.value === 'company';
+                wrapper.hidden = !visible;
+                wrapper.querySelector('input').required = visible && wrapper.dataset.requiredForCompany === 'true';
+            });
+            role.addEventListener('change', syncCompanyFields);
+            syncCompanyFields();
+        }
         modal.showModal();
     };
     const destroy = async (item) => {

@@ -16,6 +16,8 @@ use App\Services\ReliabilityPointsService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -59,7 +61,22 @@ class AdminDataController extends Controller
             }
         }
 
-        $page = $query->paginate(min(max((int) $request->query('per_page', 20), 1), 50));
+        $page = $query->paginate(5);
+
+        if ($resource === 'users') {
+            $page->getCollection()->each(function (User $user) {
+                $user->setAttribute('company_name', $user->company?->name);
+                $user->setAttribute('registration_number', $user->company?->registration_number);
+                $user->setAttribute('business_type', $user->company?->business_type);
+            });
+        }
+        if ($resource === 'companies') {
+            $page->getCollection()->each(function (Company $company) {
+                $company->setAttribute('account_name', $company->user?->name);
+                $company->setAttribute('email', $company->user?->email);
+                $company->setAttribute('subscription_status', $company->subscriptions->sortByDesc('created_at')->first()?->status ?? 'none');
+            });
+        }
 
         return response()->json([
             'data' => $page->items(),
@@ -92,7 +109,13 @@ class AdminDataController extends Controller
             $validated['source'] = 'admin';
         }
 
-        $item = $model::create($validated);
+        if ($resource === 'users') {
+            $item = DB::transaction(fn () => $this->createUser($validated));
+        } elseif ($resource === 'companies') {
+            $item = DB::transaction(fn () => $this->createCompanyWithAccount($validated));
+        } else {
+            $item = $model::create($validated);
+        }
 
         return response()->json(['data' => $item->refresh()], Response::HTTP_CREATED);
     }
@@ -115,6 +138,9 @@ class AdminDataController extends Controller
         if ($resource === 'users' && $item->id === $request->user()->id) {
             unset($validated['role'], $validated['is_suspended']);
         }
+        if ($resource === 'users' && $item->company && isset($validated['role']) && $validated['role'] !== 'company') {
+            return response()->json(['message' => 'احذف ملف الشركة بعد انتهاء اشتراكها قبل تغيير دور حسابها.'], Response::HTTP_CONFLICT);
+        }
         if ($resource === 'reports' && isset($validated['status']) && in_array($validated['status'], ['approved', 'rejected', 'resolved'], true)) {
             $validated['reviewed_by'] = $request->user()->id;
             $validated['reviewed_at'] = now();
@@ -133,7 +159,36 @@ class AdminDataController extends Controller
             unset($validated['admin_note']);
         }
 
-        $item->update($validated);
+        if ($resource === 'users') {
+            DB::transaction(function () use ($item, &$validated) {
+                $companyFields = Arr::only($validated, ['company_name', 'registration_number', 'business_type', 'phone', 'website']);
+                unset($validated['company_name'], $validated['registration_number'], $validated['business_type'], $validated['phone'], $validated['website']);
+                $password = $validated['password'] ?? null;
+                unset($validated['password']);
+                $item->update($validated);
+                if ($password) $item->update(['password' => $password]);
+                if (($item->role === 'company' || $item->company) && $companyFields) {
+                    $companyFields['name'] = $companyFields['company_name'] ?? $item->company?->name ?? $item->name;
+                    unset($companyFields['company_name']);
+                    $item->company()->updateOrCreate([], $companyFields + ['status' => 'pending']);
+                }
+            });
+        } elseif ($resource === 'companies') {
+            DB::transaction(function () use ($item, &$validated) {
+                $userFields = Arr::only($validated, ['account_name', 'email', 'password']);
+                unset($validated['account_name'], $validated['email'], $validated['password']);
+                $item->update($validated);
+                $account = $item->user;
+                if ($account) {
+                    if (isset($userFields['account_name'])) $account->name = $userFields['account_name'];
+                    if (isset($userFields['email'])) $account->email = $userFields['email'];
+                    if (! empty($userFields['password'])) $account->password = $userFields['password'];
+                    $account->save();
+                }
+            });
+        } else {
+            $item->update($validated);
+        }
 
         if ($resource === 'reports' && $nextFalseFlag && ! $previousFalseFlag) {
             $this->points->flagFalseReport($item);
@@ -156,15 +211,16 @@ class AdminDataController extends Controller
         }
         if ($resource === 'users') {
             $company = $item->company;
-            if ($company && ($company->subscriptions()->exists() || $company->payments()->exists())) {
-                return response()->json(['message' => 'لا يمكن حذف مستخدم مرتبط بسجلات مالية؛ أوقف الحساب بدلاً من ذلك.'], Response::HTTP_CONFLICT);
+            if ($company && ($reason = $this->companyDeletionBlockReason($company))) {
+                return response()->json(['message' => $reason], Response::HTTP_CONFLICT);
             }
+            $company?->delete();
         }
         if ($resource === 'payments' && $item->status === 'paid') {
             return response()->json(['message' => 'سجل الدفع الناجح محفوظ للتدقيق ولا يمكن حذفه.'], Response::HTTP_CONFLICT);
         }
-        if ($resource === 'companies' && ($item->subscriptions()->exists() || $item->payments()->exists())) {
-            return response()->json(['message' => 'لا يمكن حذف شركة لها سجلات مالية؛ غيّر حالتها إلى archived بدلاً من ذلك.'], Response::HTTP_CONFLICT);
+        if ($resource === 'companies' && ($reason = $this->companyDeletionBlockReason($item))) {
+            return response()->json(['message' => $reason], Response::HTTP_CONFLICT);
         }
         if ($resource === 'subscription-plans' && $item->subscriptions()->exists()) {
             return response()->json(['message' => 'لا يمكن حذف باقة مرتبطة باشتراك؛ أوقف نشرها بدلاً من ذلك.'], Response::HTTP_CONFLICT);
@@ -173,7 +229,9 @@ class AdminDataController extends Controller
         if ($resource === 'reports') {
             $item->load('media')->media->each(fn ($media) => Storage::disk($media->disk)->delete($media->path));
         }
+        $companyAccount = $resource === 'companies' ? $item->user : null;
         $item->delete();
+        if ($companyAccount && $companyAccount->exists) $companyAccount->delete();
 
         return response()->json(['message' => 'تم الحذف.']);
     }
@@ -183,6 +241,56 @@ class AdminDataController extends Controller
         if ($resource === 'reports') {
             $this->authorize($ability, $item ?? Report::class);
         }
+    }
+
+    private function createUser(array $validated): User
+    {
+        $companyFields = Arr::only($validated, ['company_name', 'registration_number', 'business_type', 'phone', 'website']);
+        unset($validated['company_name'], $validated['registration_number'], $validated['business_type'], $validated['phone'], $validated['website']);
+        $user = User::create($validated);
+        $user->forceFill(['email_verified_at' => now()])->save();
+
+        if ($user->role === 'company') {
+            $user->company()->create([
+                'name' => $companyFields['company_name'] ?? $user->name,
+                'registration_number' => $companyFields['registration_number'] ?? null,
+                'business_type' => $companyFields['business_type'] ?? null,
+                'phone' => $companyFields['phone'] ?? null,
+                'website' => $companyFields['website'] ?? null,
+                'status' => 'pending',
+            ]);
+        }
+
+        return $user;
+    }
+
+    private function createCompanyWithAccount(array $validated): Company
+    {
+        $account = User::create([
+            'name' => $validated['account_name'],
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+            'role' => 'company',
+        ]);
+        $account->forceFill(['email_verified_at' => now()])->save();
+        unset($validated['account_name'], $validated['email'], $validated['password']);
+
+        return Company::create($validated + ['user_id' => $account->id]);
+    }
+
+    private function companyDeletionBlockReason(Company $company): ?string
+    {
+        if ($company->subscriptions()->whereIn('status', ['active', 'past_due', 'cancelled'])->where(function (Builder $query) {
+            $query->whereNull('ends_at')->orWhere('ends_at', '>', now());
+        })->exists()) {
+            return 'لا يمكن حذف الشركة قبل انتهاء اشتراكها النشط.';
+        }
+
+        if ($company->payments()->exists()) {
+            return 'انتهى الاشتراك، لكن للشركة سجلات مالية محفوظة. أرشف الشركة بدل حذف سجل التدقيق.';
+        }
+
+        return null;
     }
 
     private function rules(string $resource, bool $creating): array
@@ -214,9 +322,13 @@ class AdminDataController extends Controller
                 'name' => [$presence, 'string', 'max:255'], 'email' => [$presence, 'email', 'max:255', Rule::unique('users', 'email')->ignore(request()->route('record'))],
                 'role' => [$presence, Rule::in(['citizen', 'company', 'admin'])], 'is_suspended' => ['sometimes', 'boolean'],
                 'password' => [$creating ? 'required' : 'sometimes', 'string', 'min:10'],
+                'company_name' => ['nullable', 'required_if:role,company', 'string', 'max:255'],
+                'registration_number' => ['nullable', 'string', 'max:120', Rule::unique('companies', 'registration_number')->ignore(Company::where('user_id', request()->route('record'))->value('id'))],
+                'business_type' => ['nullable', 'string', 'max:80'], 'phone' => ['nullable', 'string', 'max:40'], 'website' => ['nullable', 'url', 'max:255'],
             ],
             'companies' => [
-                'user_id' => [$presence, 'integer', 'exists:users,id', Rule::unique('companies', 'user_id')->ignore(request()->route('record'))],
+                'account_name' => [$presence, 'string', 'max:255'], 'email' => [$presence, 'email', 'max:255', Rule::unique('users', 'email')->ignore(Company::find(request()->route('record'))?->user_id)],
+                'password' => [$creating ? 'required' : 'sometimes', 'nullable', 'string', 'min:10'],
                 'name' => [$presence, 'string', 'max:255'], 'registration_number' => ['nullable', 'string', 'max:120', Rule::unique('companies', 'registration_number')->ignore(request()->route('record'))],
                 'business_type' => ['nullable', 'string', 'max:80'], 'phone' => ['nullable', 'string', 'max:40'], 'website' => ['nullable', 'url', 'max:255'],
                 'status' => [$presence, Rule::in(['pending', 'approved', 'rejected', 'archived'])],

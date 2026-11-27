@@ -81,8 +81,8 @@ class AdminPageController extends Controller
         $fields = match ($section) {
             'road-closures' => [['title', 'العنوان', 'text', true], ['area_name', 'المنطقة', 'text', true], ['status', 'الحالة', 'closure-status', true], ['latitude', 'خط العرض', 'number', true], ['longitude', 'خط الطول', 'number', true], ['diversion', 'التحويلة', 'text', false]],
             'alerts' => [['title', 'عنوان التنبيه', 'text', true], ['message', 'الرسالة', 'textarea', true], ['severity', 'الخطورة', 'severity', true], ['area_name', 'المنطقة', 'text', false], ['source', 'المصدر', 'source', true], ['is_active', 'نشط', 'boolean', false]],
-            'users' => [['name', 'الاسم', 'text', true], ['email', 'البريد الإلكتروني', 'email', true], ['password', 'كلمة المرور المؤقتة', 'password', true], ['role', 'الدور', 'role', true], ['is_suspended', 'موقوف', 'boolean', false]],
-            'companies' => [['user_id', 'رقم حساب المستخدم', 'number', true], ['name', 'اسم الشركة', 'text', true], ['registration_number', 'رقم التسجيل', 'text', false], ['business_type', 'النشاط', 'text', false], ['status', 'الحالة', 'company-status', true]],
+            'users' => [['name', 'الاسم', 'text', true], ['email', 'البريد الإلكتروني', 'email', true], ['role', 'الدور', 'role', true], ['company_name', 'اسم الشركة عند اختيار دور شركة', 'company-name', true], ['business_type', 'نشاط الشركة', 'company-business', false], ['password', 'كلمة المرور المؤقتة', 'password', true], ['registration_number', 'رقم التسجيل', 'company-registration', false], ['phone', 'هاتف الشركة', 'company-phone', false], ['website', 'موقع الشركة', 'company-website', false], ['is_suspended', 'موقوف', 'boolean', false]],
+            'companies' => [['name', 'اسم الشركة', 'text', true], ['account_name', 'اسم حساب الشركة', 'text', true], ['email', 'بريد حساب الشركة', 'email', true], ['registration_number', 'رقم التسجيل', 'text', false], ['status', 'الحالة', 'company-status', true], ['business_type', 'النشاط', 'text', false], ['password', 'كلمة مرور الحساب المؤقتة', 'password', true], ['phone', 'الهاتف', 'text', false], ['website', 'الموقع الإلكتروني', 'url', false]],
             'subscriptions' => [['company_id', 'رقم الشركة', 'number', true], ['subscription_plan_id', 'رقم الباقة', 'number', true], ['status', 'الحالة', 'subscription-status', true], ['starts_at', 'يبدأ في', 'datetime-local', false], ['ends_at', 'ينتهي في', 'datetime-local', false]],
             'payments' => [['company_id', 'رقم الشركة', 'number', true], ['subscription_id', 'رقم الاشتراك', 'number', false], ['amount', 'المبلغ', 'number', true], ['currency', 'العملة', 'text', true], ['status', 'الحالة', 'payment-status', true], ['provider', 'المزوّد', 'provider', true]],
             'contacts' => [['name', 'الاسم', 'text', true], ['email', 'البريد الإلكتروني', 'email', true], ['subject', 'الموضوع', 'text', true], ['message', 'الرسالة', 'textarea', true], ['status', 'الحالة', 'contact-status', true]],
@@ -90,10 +90,19 @@ class AdminPageController extends Controller
             default => [],
         };
 
+        $createLabels = [
+            'road-closures' => '＋ إضافة إغلاق طريق',
+            'alerts' => '＋ إضافة تنبيه',
+            'users' => '＋ إضافة مواطن أو حساب شركة',
+            'companies' => '＋ إضافة شركة وحسابها',
+            'subscription-plans' => '＋ إضافة باقة',
+        ];
+
         return view($section === 'reports' ? 'admin.reports' : 'admin.resource', [
             'section' => $section,
             'title' => $labels[$section],
             'fields' => $fields,
+            'createLabel' => $createLabels[$section] ?? '＋ إضافة سجل',
         ]);
     }
 }

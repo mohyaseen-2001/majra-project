@@ -79,7 +79,7 @@ class CompanyPortalController extends Controller
         if (! empty($filters['to'])) {
             $query->whereDate('created_at', '<=', $filters['to']);
         }
-        $reports = $query->with('media')->latest()->paginate(15)->withQueryString();
+        $reports = $query->with('media')->latest()->paginate(5)->withQueryString();
         $closures = RoadClosure::query()->whereIn('area_name', $names)->latest()->limit(30)->get();
 
         return view('company.reports', compact('reports', 'closures'));
