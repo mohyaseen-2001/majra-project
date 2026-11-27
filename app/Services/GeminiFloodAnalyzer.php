@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Models\AiAnalysis;
 use App\Models\Report;
 use App\Models\ReportMedia;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
@@ -44,7 +47,9 @@ class GeminiFloodAnalyzer
             $mime = $media->mime_type ?: 'image/jpeg';
             $response = Http::acceptJson()
                 ->withHeaders(['x-goog-api-key' => $apiKey, 'Api-Revision' => '2026-05-20'])
-                ->connectTimeout(5)->timeout(25)
+                ->connectTimeout(4)->timeout(12)
+                ->retry(2, 400, fn (\Exception $exception, PendingRequest $request) => $exception instanceof ConnectionException
+                    || ($exception instanceof RequestException && $exception->response->serverError()))
                 ->post('https://generativelanguage.googleapis.com/v1beta/interactions', [
                     'model' => config('services.gemini.model', 'gemini-3.8-flash'),
                     'store' => false,
@@ -75,7 +80,13 @@ class GeminiFloodAnalyzer
 
             $text = collect($response['steps'] ?? [])->where('type', 'model_output')->flatMap(fn ($step) => $step['content'] ?? [])->firstWhere('type', 'text')['text'] ?? null;
             $result = is_string($text) ? json_decode($text, true, flags: JSON_THROW_ON_ERROR) : null;
-            if (! is_array($result)) {
+            if (! is_array($result)
+                || ! is_bool($result['is_flood'] ?? null)
+                || ! in_array($result['hazard_type'] ?? null, ['flood', 'waterlogging', 'road_hazard', 'other', 'unknown'], true)
+                || ! in_array($result['risk_level'] ?? null, ['unknown', 'low', 'medium', 'high', 'critical'], true)
+                || ! is_numeric($result['confidence'] ?? null)
+                || ! is_int($result['image_quality_score'] ?? null)
+                || ! is_string($result['notes'] ?? null)) {
                 throw new \UnexpectedValueException('Gemini response did not include structured output.');
             }
 
@@ -89,7 +100,12 @@ class GeminiFloodAnalyzer
             $report->update(['status' => 'ai_checked', 'risk_level' => $result['risk_level'], 'ai_checked_at' => now()]);
 
             return $analysis;
-        } catch (\Throwable) {
+        } catch (\Throwable $exception) {
+            logger()->warning('Gemini image analysis unavailable', [
+                'report_id' => $report->id,
+                'exception' => $exception::class,
+                'http_status' => $exception instanceof RequestException ? $exception->response->status() : null,
+            ]);
             return $this->recordFailure($report, 'تعذر فحص الصورة آلياً؛ البلاغ محفوظ للمراجعة اليدوية.');
         }
     }
