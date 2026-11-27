@@ -10,6 +10,7 @@ import './admin-reports';
 import './admin-resource';
 import './assistant';
 import './animations';
+import './preferences';
 
 import Alpine from 'alpinejs';
 

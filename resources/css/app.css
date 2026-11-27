@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root[data-theme="light"] { color-scheme: light; --night:#f3f7fa; --night-soft:#e8f0f5; --panel:#fff; --line:rgba(31,69,91,.18); --muted:#526a79; --white:#102b3a; --blue:#087ea4; --cyan:#087f83; --amber:#9c6500; --orange:#bd4c24; }
+:root[data-theme="light"] body { background:#f3f7fa; color:#173341; }
+:root[data-theme="light"] .majra-site { background:radial-gradient(ellipse at 77% 16%,rgba(20,94,128,.09),transparent 34%),#f3f7fa; }
+:root[data-theme="light"] .admin-body { background:#f3f7fa; color:#173341; }
+:root[data-theme="light"] .admin-sidebar,:root[data-theme="light"] .admin-panel,:root[data-theme="light"] .admin-drawer,:root[data-theme="light"] .admin-modal,:root[data-theme="light"] .citizen-card,:root[data-theme="light"] .report-card,:root[data-theme="light"] .chat-box { background:#fff; color:#173341; }
+:root[data-theme="light"] .admin-topbar { background:rgba(243,247,250,.94); }
+:root[data-theme="light"] .admin-stat-card { background:linear-gradient(145deg,#fff,#edf4f7); }
+:root[data-theme="light"] .admin-table td,:root[data-theme="light"] .admin-table th { color:#395766; }
+:root[data-theme="light"] .admin-search,:root[data-theme="light"] .admin-filters select,:root[data-theme="light"] .modal-field input,:root[data-theme="light"] .modal-field select,:root[data-theme="light"] .modal-field textarea,:root[data-theme="light"] .form-field input,:root[data-theme="light"] .form-field textarea { background:#f5f9fb; color:#173341; }
+.majra-preferences { position:fixed; z-index:1500; left:14px; bottom:14px; display:flex; gap:6px; padding:5px; border:1px solid var(--line); border-radius:999px; background:rgba(8,25,39,.92); box-shadow:0 5px 20px #0002; }
+.majra-preferences button { border:0; border-radius:999px; padding:6px 10px; background:transparent; color:#dcecf2; font:inherit; font-size:11px; cursor:pointer; }
+:root[data-theme="light"] .majra-preferences { background:rgba(255,255,255,.94); }
+:root[data-theme="light"] .majra-preferences button { color:#173341; }
+:root[data-theme="light"] .admin-menu-link,:root[data-theme="light"] .admin-topbar strong,:root[data-theme="light"] .admin-welcome h1,:root[data-theme="light"] .admin-page-intro h1,:root[data-theme="light"] .panel-header h2,:root[data-theme="light"] .citizen-card h2,:root[data-theme="light"] .report-card h2 { color:#173341; }
+:root[data-theme="light"] .site-nav,:root[data-theme="light"] .ops-nav,:root[data-theme="light"] .admin-account,:root[data-theme="light"] .admin-stat-card strong,:root[data-theme="light"] .admin-table td { color:#294b5b; }
+:root[data-theme="light"] .company-list,:root[data-theme="light"] .company-list article,:root[data-theme="light"] .company-list>a { color:#294b5b; }
+body.admin-body .majra-preferences { left:260px; }
+@media (max-width:720px) { body.admin-body .majra-preferences { left:14px; } }
