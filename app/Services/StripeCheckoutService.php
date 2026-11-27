@@ -8,6 +8,7 @@ use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -82,19 +83,26 @@ class StripeCheckoutService
         if (($session['mode'] ?? null) !== 'subscription' || ($session['payment_status'] ?? null) !== 'paid') {
             return;
         }
-        $payment = Payment::query()->where('checkout_session_id', $session['id'] ?? '')->with('subscription')->first();
-        if (! $payment || ! $payment->subscription) {
+        if (! is_string($session['id'] ?? null) || $session['id'] === '') {
             return;
         }
 
-        $payment->update([
-            'status' => 'paid',
-            'payment_intent_id' => is_string($session['payment_intent'] ?? null) ? $session['payment_intent'] : null,
-            'paid_at' => now(),
-        ]);
-        $payment->subscription->update([
-            'status' => 'active', 'stripe_customer_id' => $session['customer'] ?? null,
-            'stripe_subscription_id' => $session['subscription'] ?? null, 'starts_at' => now(),
-        ]);
+        DB::transaction(function () use ($session): void {
+            $payment = Payment::query()->where('checkout_session_id', $session['id'])->lockForUpdate()->first();
+            $subscription = $payment?->subscription;
+            if (! $payment || $payment->status !== 'pending' || ! $subscription || $subscription->status !== 'pending') {
+                return;
+            }
+
+            $payment->update([
+                'status' => 'paid',
+                'payment_intent_id' => is_string($session['payment_intent'] ?? null) ? $session['payment_intent'] : null,
+                'paid_at' => now(),
+            ]);
+            $subscription->update([
+                'status' => 'active', 'stripe_customer_id' => $session['customer'] ?? null,
+                'stripe_subscription_id' => $session['subscription'] ?? null, 'starts_at' => now(),
+            ]);
+        });
     }
 }
