@@ -1,4 +1,7 @@
+import userPageEnglish from './user-page-en.json';
+
 const translations = {
+    ...userPageEnglish,
     'غرفة عمليات السيول': 'Flood Operations Center', 'غرفة العمليات': 'Operations Room', 'الخريطة': 'Map', 'البلاغات': 'Reports', 'أرسل بلاغاً': 'Submit a report',
     'لوحة الشركة': 'Company dashboard', 'مناطقي': 'My areas', 'التقارير': 'Reports', 'الاشتراك': 'Subscription', 'لوحة المتابعة': 'Dashboard', 'الملف الشخصي': 'Profile',
     'تسجيل الخروج': 'Log out', 'خروج': 'Log out', 'الرئيسية': 'Overview', 'إغلاقات الطرق': 'Road closures', 'التنبيهات': 'Alerts', 'المواطنون': 'Citizens', 'الشركات': 'Companies',
@@ -52,6 +55,21 @@ const translations = {
 
 const root = document.documentElement;
 const savedText = new WeakMap();
+const mixedLabels = {
+    'مقدم البلاغ:': 'Reported by:', 'المراجعة النهائية:': 'Last reviewed:',
+    'أكدوا استمرار الخطر': 'confirmed the hazard remains', 'أفادوا بانتهائه': 'reported it ended',
+    'بلاغاً موثّقاً': 'verified reports', 'نقطة موثوقية': 'reliability points',
+    'نتيجة ·': 'results ·', 'احتمال هطول': 'Rain probability', 'رطوبة': 'Humidity',
+    'آخر تحديث': 'Last updated', 'أهلاً،': 'Welcome,', 'الحالة:': 'Status:',
+};
+const mixedPattern = new RegExp(Object.keys(mixedLabels).join('|'), 'g');
+function englishText(text) {
+    if (Object.hasOwn(translations, text)) return translations[text];
+    return text.split(/(\s*·\s*|\s+\/\s+)/).map(part => {
+        if (Object.hasOwn(translations, part)) return translations[part];
+        return part.replace(mixedPattern, label => mixedLabels[label]);
+    }).join('');
+}
 const ignored = 'script, style, textarea, code, [translate="no"]';
 const attributes = ['placeholder', 'aria-label', 'title'];
 let lang = localStorage.getItem('majra-language') === 'en' ? 'en' : 'ar';
@@ -61,8 +79,9 @@ function translateText(node) {
     const saved = savedText.get(node);
     const source = saved && saved.rendered === value ? saved.source : value;
     const key = source.trim();
-    if (!Object.hasOwn(translations, key)) return;
-    const rendered = lang === 'en' ? source.replace(key, translations[key]) : source;
+    const english = englishText(key);
+    if (english === key) return;
+    const rendered = lang === 'en' ? source.replace(key, () => english) : source;
     savedText.set(node, { source, rendered });
     if (value !== rendered) node.data = rendered;
 }
@@ -118,12 +137,12 @@ function updateControls() {
 
 root.dataset.theme = localStorage.getItem('majra-theme') === 'light' ? 'light' : 'dark';
 updateControls();
-if (lang === 'en') translateTree(document.body);
+if (lang === 'en') translateTree(document.documentElement);
 select.addEventListener('change', () => {
     lang = select.value;
     localStorage.setItem('majra-language', lang);
     updateControls();
-    translateTree(document.body);
+    translateTree(document.documentElement);
 });
 themeButton.addEventListener('click', () => {
     root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
