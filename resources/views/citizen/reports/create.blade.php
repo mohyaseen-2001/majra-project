@@ -16,9 +16,9 @@
             <div class="form-actions"><button class="button" type="submit">إرسال للمراجعة <span>←</span></button><span>لن تُمنح نقاط قبل اعتماد البلاغ.</span></div>
         </form>
     </section>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script>
+    @vite('resources/js/maps.js')
+    <script type="module">
+        const L = window.L;
         const picker = L.map('report-picker').setView([31.2, 36.2], 7);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap contributors' }).addTo(picker);
         let chosenMarker;
@@ -26,7 +26,11 @@
             document.getElementById('report-lat').value = lat.toFixed(7);
             document.getElementById('report-lng').value = lng.toFixed(7);
             document.getElementById('coordinate-hint').textContent = `${source === 'gps' ? 'تم تحديد الموقع عبر GPS لمرة واحدة' : 'تم اختيار الموقع من الخريطة'} · ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-            chosenMarker ? chosenMarker.setLatLng([lat, lng]) : chosenMarker = L.marker([lat, lng]).addTo(picker);
+            if (chosenMarker) {
+                chosenMarker.setLatLng([lat, lng]);
+            } else {
+                chosenMarker = L.circleMarker([lat, lng], { radius: 8, color: '#087f83', fillOpacity: 0.85 }).addTo(picker);
+            }
         };
         picker.on('click', ({latlng}) => setPoint(latlng.lat, latlng.lng));
         const locationHint = document.getElementById('coordinate-hint');

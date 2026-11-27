@@ -27,9 +27,9 @@
         </div>
     </section>
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script>
+    @vite('resources/js/maps.js')
+    <script type="module">
+        const L = window.L;
         const majraReports = {{ Illuminate\Support\Js::from($reports->map(fn ($report) => ['lat' => (float) $report->latitude, 'lng' => (float) $report->longitude, 'title' => $report->title, 'area' => $report->area_name, 'risk' => $report->risk_level, 'status' => $report->status, 'url' => route('reports.show', $report->public_id)])) }};
         const majraClosures = {{ Illuminate\Support\Js::from($closures->map(fn ($closure) => ['lat' => (float) $closure->latitude, 'lng' => (float) $closure->longitude, 'title' => $closure->title, 'area' => $closure->area_name])) }};
         const map = L.map('majra-map', { scrollWheelZoom: false }).setView([31.2, 36.2], 7);
