@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
@@ -15,11 +16,10 @@ class HospitalFinderService
             return $cached + ['stale' => false];
         }
 
-        $query = '[out:json][timeout:15];(node["amenity"="hospital"](around:'.($radiusKm * 1000).','.$latitude.','.$longitude.');way["amenity"="hospital"](around:'.($radiusKm * 1000).','.$latitude.','.$longitude.');relation["amenity"="hospital"](around:'.($radiusKm * 1000).','.$latitude.','.$longitude.'););out center tags;';
+        $query = sprintf('[out:json][timeout:7];nwr["amenity"="hospital"](around:%d,%F,%F);out center tags;', $radiusKm * 1000, $latitude, $longitude);
 
         try {
-            $data = Http::asForm()->acceptJson()->connectTimeout(4)->timeout(18)
-                ->post('https://overpass-api.de/api/interpreter', ['data' => $query])->throw()->json();
+            $data = $this->fetch($query);
 
             $hospitals = collect($data['elements'] ?? [])->map(function (array $place) {
                 $lat = $place['lat'] ?? $place['center']['lat'] ?? null;
@@ -46,10 +46,27 @@ class HospitalFinderService
         } catch (\Throwable) {
             $last = Cache::get($key.':last');
             if (is_array($last)) {
-                return $last + ['stale' => true];
+                return ['stale' => true] + $last;
             }
 
             return ['available' => false, 'source' => 'OpenStreetMap / Overpass', 'message' => 'تعذر جلب المستشفيات القريبة. تحقق من المصادر الرسمية عند الحاجة.', 'updated_at' => null, 'data' => [], 'stale' => false];
         }
+    }
+
+    private function fetch(string $query): array
+    {
+        foreach (['https://overpass-api.de/api/interpreter', 'https://overpass.private.coffee/api/interpreter'] as $endpoint) {
+            try {
+                $response = Http::withUserAgent('Majra/1.0 (Jordan flood monitoring; hospital map)')
+                    ->connectTimeout(3)->timeout(9)->get($endpoint, ['data' => $query]);
+                if ($response->successful() && is_array($response->json('elements'))) {
+                    return $response->json();
+                }
+            } catch (ConnectionException) {
+                continue;
+            }
+        }
+
+        throw new \RuntimeException('Overpass hospital data is unavailable.');
     }
 }

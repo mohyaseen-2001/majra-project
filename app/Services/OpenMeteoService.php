@@ -40,7 +40,7 @@ class OpenMeteoService
         } catch (\Throwable) {
             $last = Cache::get($key.':last');
             if (is_array($last)) {
-                return $last + ['stale' => true];
+                return ['stale' => true] + $last;
             }
 
             return ['available' => false, 'source' => 'Open-Meteo', 'message' => 'بيانات الطقس غير متاحة حالياً.', 'updated_at' => null, 'stale' => false];
