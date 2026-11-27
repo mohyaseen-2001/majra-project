@@ -19,7 +19,11 @@ Route::get('/contact', [PublicPageController::class, 'contact'])->name('contact'
 Route::post('/contact', [PublicPageController::class, 'storeContact'])->middleware('throttle:5,1')->name('contact.store');
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    return match (auth()->user()->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'company' => redirect()->route('company.dashboard'),
+        default => view('dashboard'),
+    };
 })->middleware('auth')->name('dashboard');
 
 Route::middleware(['auth', 'role:company'])->prefix('company')->name('company.')->group(function () {

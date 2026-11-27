@@ -20,3 +20,13 @@
 @media (max-width: 900px) {
     .site-header:has(.majra-preferences), .admin-topbar:has(.majra-preferences) { flex-wrap: wrap; height: auto; gap: .5rem; padding-block: .5rem; }
 }
+@media (max-width: 600px) {
+    .site-header:has(.majra-preferences) .site-nav {
+        display: flex;
+        flex-basis: 100%;
+        flex-wrap: wrap;
+        gap: .65rem 1rem;
+        order: 1;
+        padding-block: .35rem;
+    }
+}
