@@ -1,53 +1,101 @@
-# مَجرى
+# Majra (مَجرى)
 
-منصة ويب أردنية للإنذار المبكر ورصد مخاطر السيول والطرق المتأثرة. هذا المستودع بدأ من جديد كتطبيق Laravel مع واجهات Blade.
+Majra is a Jordan-focused early warning and community reporting platform for flood risks, affected roads, alerts, and company area monitoring. It is built with Laravel 12, PHP 8.2+, Blade, and Vite.
 
-## البيئة
+## Requirements
 
-- PHP 8.2 أو أحدث ضمن إصدارات Laravel 12 المدعومة
+- PHP 8.2 or later, with the Laravel-required extensions
 - Composer
-- Node.js و npm
-- MySQL (يمكن تشغيله من XAMPP)
+- Node.js and npm
+- MySQL (XAMPP is suitable for local development)
 
-## التشغيل المحلي
+## Local setup
 
-1. شغّل MySQL من XAMPP وأنشئ قاعدة بيانات باسم `majra` من phpMyAdmin.
-2. من مجلد المشروع انسخ `.env.example` إلى `.env`.
-3. نفّذ `composer install`.
-4. نفّذ `php artisan key:generate`.
-5. نفّذ `php artisan migrate --seed` لإنشاء جداول المنصة وبيانات العرض التجريبي.
-6. نفّذ `npm install` ثم `npm run build`.
-7. شغّل `php artisan serve` وافتح `http://127.0.0.1:8000`.
+Run these commands from the project root in PowerShell.
 
-واجهة الصفحة الرئيسية بالعربية واتجاه RTL. تسجيل الحساب متاح للمواطن والشركة؛ حساب الإدارة لا يُنشأ من شاشة التسجيل العامة.
+1. Start MySQL in XAMPP and create a database named `majra` in phpMyAdmin.
+2. Create `.env` from the example only if you do not already have a local `.env` file. This preserves existing local settings and API keys:
 
-## حسابات العرض التجريبي
+   ```powershell
+   if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+   ```
 
-كل الحسابات التالية تستخدم كلمة المرور `MajraDemo2026!`، وهي بيانات محلية للعرض الأكاديمي فقط:
+3. Install PHP dependencies and create the Laravel application key:
 
-- الإدارة: `admin@majra.demo`
-- المواطن: `citizen@majra.demo`
-- الشركة: `company@majra.demo`
+   ```powershell
+   composer install
+   php artisan key:generate
+   ```
 
-البلاغ والتنبيه وإغلاق الطريق التجريبي موسومة بوضوح داخل البيانات، ولا تمثل معلومات ميدانية حقيقية.
+4. Check the database settings in `.env`. The defaults in `.env.example` are for a local XAMPP MySQL server (`127.0.0.1:3306`, database `majra`, username `root`, blank password). Update them if your local MySQL setup differs.
+5. Create the database tables and seed the demo accounts and sample data:
 
-## الإعدادات
+   ```powershell
+   php artisan migrate --seed
+   php artisan storage:link
+   ```
 
-قيم MySQL المحلية موجودة في `.env.example`. المفاتيح السرية والتكاملات الخارجية تضاف إلى `.env` ولا تحفظ في Git.
+6. Install and build the frontend assets:
 
-### التكاملات الخارجية
+   ```powershell
+   npm install
+   npm run build
+   ```
 
-- الطقس يأتي من Open-Meteo، وبيانات المستشفيات من OpenStreetMap/Overpass. عند تعطل المصدر تظهر بيانات احتياطية موسومة بوضوح.
-- تحليل Gemini اختياري: أضف `GEMINI_API_KEY` إلى `.env`. يبقى تحليل الصورة توصية للمراجع، وتُحفظ البلاغات للمراجعة اليدوية عند غياب المفتاح أو تعطل الخدمة.
-- Stripe اختياري ويقبل مفاتيح الاختبار فقط: `STRIPE_KEY=pk_test_...` و`STRIPE_SECRET=sk_test_...` و`STRIPE_WEBHOOK_SECRET=whsec_...`. وجه webhook إلى `https://عنوان-مشروعك/api/stripe/webhook` واستمع إلى `checkout.session.completed`. صفحة العودة لا تفعّل الاشتراك؛ التفعيل بعد التحقق من توقيع webhook والدفع.
-- مساعد السلامة يستخدم إجابات محددة داخل التطبيق، ويعيد الإجابات المحلية إذا تعذر API. أرقام الطوارئ موثقة في دليل السلامة بروابط بوابة الأردن ومديرية الأمن العام.
+7. Start the Laravel server and open `http://127.0.0.1:8000`:
 
-### التشغيل للعرض الأكاديمي
+   ```powershell
+   php artisan serve
+   ```
 
-1. جهّز `.env`، ثم نفّذ `php artisan key:generate` و`php artisan migrate --seed`.
-2. نفّذ `php artisan storage:link` لصور البلاغات.
-3. نفّذ `npm install` و`npm run build`، ثم `php artisan serve`.
-4. اعرض التطبيق من الصفحة الرئيسية. المواطن يرسل بلاغاً؛ والأدمن يراجعه من لوحة العمليات؛ والشركة تضيف أسماء مناطقها من صفحة «مناطقي» ثم تعرض البلاغات والإغلاقات المطابقة لها.
-5. للاختبار المحلي شغّل `php artisan test`. تهيئة الدفع الحقيقي خارج نطاق هذا المشروع؛ استخدم مفاتيح Stripe التجريبية فقط.
+For frontend development with hot reload, run `npm run dev` in a second terminal instead of `npm run build`.
 
-البلاغات التجريبية موسومة بعلامة العرض. مطابقة مناطق الشركات تعتمد الاسم المكتوب كما يظهر في البلاغ، والخريطة لا تتعقب موقع المستخدم في الخلفية.
+## Demo accounts
+
+All seeded demo accounts use this password:
+
+```text
+MajraDemo2026!
+```
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Administrator | `admin@majra.demo` | `MajraDemo2026!` |
+| Citizen | `citizen@majra.demo` | `MajraDemo2026!` |
+| Company with an active demo subscription | `company@majra.demo` | `MajraDemo2026!` |
+| Company with an expired demo subscription | `expired-company@majra.demo` | `MajraDemo2026!` |
+
+These credentials are for local academic demonstrations only. Change or remove them before deploying the application publicly.
+
+## Main workflows
+
+- Citizens can view the map and reports, submit reports after signing in, and choose GPS to set a report location.
+- Administrators can review and delete reports, manage alerts and road closures, manage citizens and company accounts, and manage subscription plans.
+- Company accounts can manage monitored areas and view matching reports and road closures.
+- Company deletion is blocked while its subscription is active. Financial records are retained for audit; archive a company with payment history instead of deleting it.
+- Demo reports, alerts, and road closures are labeled as sample data and do not describe real-world conditions.
+
+## Optional integrations
+
+Keep API keys and payment secrets in the ignored local `.env` file. Never commit `.env` or paste secret values into this README.
+
+- Gemini report analysis is optional. Set `GEMINI_API_KEY` in `.env`; manual review remains available when the integration is not configured.
+- Stripe is optional and should use test credentials for local development: `STRIPE_KEY`, `STRIPE_SECRET`, and `STRIPE_WEBHOOK_SECRET`. Subscription activation is confirmed by the signed Stripe webhook, not by the checkout return page.
+- Weather data uses Open-Meteo. Nearby hospital information uses OpenStreetMap/Overpass.
+
+## Tests
+
+Run the automated test suite with:
+
+```powershell
+php artisan test
+```
+
+## Useful commands
+
+```powershell
+php artisan migrate --seed  # Apply migrations and add demo data
+php artisan db:seed         # Re-run the idempotent demo seeder
+npm run dev                 # Start Vite hot reload
+npm run build               # Build production frontend assets
+```
