@@ -59,7 +59,7 @@ class DatabaseSeeder extends Seeder
             ['slug' => 'monitor', 'name' => 'مراقبة المناطق', 'price' => 19, 'features' => ['مناطق متابعة محفوظة', 'تنبيهات مخصصة', 'تقارير مخاطر']],
             ['slug' => 'operations', 'name' => 'العمليات', 'price' => 39, 'features' => ['كل مزايا مراقبة المناطق', 'سجل الإغلاقات', 'ملخصات تشغيلية']],
         ] as $plan) {
-            $plans[$plan['slug']] = SubscriptionPlan::updateOrCreate(['slug' => $plan['slug']], $plan + ['currency' => 'JOD', 'interval' => 'month', 'is_active' => true]);
+            $plans[$plan['slug']] = SubscriptionPlan::updateOrCreate(['slug' => $plan['slug']], $plan + ['currency' => 'USD', 'interval' => 'month', 'is_active' => true]);
         }
 
         \App\Models\Subscription::firstOrCreate(
