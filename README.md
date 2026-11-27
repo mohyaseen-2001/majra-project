@@ -80,7 +80,7 @@ These credentials are for local academic demonstrations only. Change or remove t
 Keep API keys and payment secrets in the ignored local `.env` file. Never commit `.env` or paste secret values into this README.
 
 - Gemini report analysis is optional. Set `GEMINI_API_KEY` in `.env`; manual review remains available when the integration is not configured.
-- Stripe is optional and should use test credentials for local development: `STRIPE_KEY`, `STRIPE_SECRET`, and `STRIPE_WEBHOOK_SECRET`. Subscription activation is confirmed by the signed Stripe webhook, not by the checkout return page.
+- Stripe is optional and should use test credentials for local development: `STRIPE_SECRET` and `STRIPE_WEBHOOK_SECRET`. For local testing, run `stripe listen --events checkout.session.completed --forward-to http://127.0.0.1:8000/api/stripe/webhook` with the same Stripe test account. Set the signing secret printed by the listener in `.env` and keep the listener running during checkout. The signed webhook activates the subscription.
 - Weather data uses Open-Meteo. Nearby hospital information uses OpenStreetMap/Overpass.
 
 ## Tests

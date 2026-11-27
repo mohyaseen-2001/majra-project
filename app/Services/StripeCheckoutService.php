@@ -11,10 +11,16 @@ use RuntimeException;
 
 class StripeCheckoutService
 {
+    public static function configured(): bool
+    {
+        return str_starts_with((string) config('services.stripe.secret'), 'sk_test_')
+            && str_starts_with((string) config('services.stripe.webhook_secret'), 'whsec_');
+    }
+
     public function start(Company $company, SubscriptionPlan $plan): string
     {
         $secret = (string) config('services.stripe.secret');
-        if (! str_starts_with($secret, 'sk_test_')) {
+        if (! self::configured()) {
             throw new RuntimeException('Stripe Test Mode is not configured.');
         }
 

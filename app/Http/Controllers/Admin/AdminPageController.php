@@ -10,6 +10,7 @@ use App\Models\Report;
 use App\Models\RoadClosure;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Services\StripeCheckoutService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\View\View;
 
@@ -39,7 +40,7 @@ class AdminPageController extends Controller
                 ['Open-Meteo', $this->weatherStatus(), $this->weatherTone()],
                 ['OpenStreetMap', 'بيانات المستشفيات عند الطلب', 'ready'],
                 ['Gemini', config('services.gemini.key') ? 'المفتاح مهيأ' : 'غير مهيأ · المراجعة اليدوية متاحة', config('services.gemini.key') ? 'ready' : 'pending'],
-                ['Stripe Test', $this->stripeReady() ? 'مهيأ للدفع التجريبي' : 'غير مهيأ · الدفع غير متاح', $this->stripeReady() ? 'ready' : 'pending'],
+                ['Stripe Test', StripeCheckoutService::configured() ? 'مهيأ للدفع التجريبي' : 'غير مهيأ · الدفع غير متاح', StripeCheckoutService::configured() ? 'ready' : 'pending'],
             ],
         ]);
     }
@@ -61,13 +62,6 @@ class AdminPageController extends Controller
         $weather = Cache::get('majra:weather:31.95:35.91:last');
 
         return ! is_array($weather) ? 'ready' : (($weather['available'] ?? false) ? 'good' : 'pending');
-    }
-
-    private function stripeReady(): bool
-    {
-        return str_starts_with((string) config('services.stripe.key'), 'pk_test_')
-            && str_starts_with((string) config('services.stripe.secret'), 'sk_test_')
-            && str_starts_with((string) config('services.stripe.webhook_secret'), 'whsec_');
     }
 
     public function section(string $section): View

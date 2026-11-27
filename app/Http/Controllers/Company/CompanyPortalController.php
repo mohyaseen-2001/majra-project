@@ -7,6 +7,7 @@ use App\Models\CompanyArea;
 use App\Models\Report;
 use App\Models\RoadClosure;
 use App\Models\SubscriptionPlan;
+use App\Services\StripeCheckoutService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -93,7 +94,7 @@ class CompanyPortalController extends Controller
             'plans' => SubscriptionPlan::query()->where('is_active', true)->orderBy('price')->get(),
             'subscription' => $company->subscriptions()->with('plan')->latest()->first(),
             'payments' => $company->payments()->latest()->limit(10)->get(),
-            'stripeReady' => str_starts_with((string) config('services.stripe.secret'), 'sk_test_') && (bool) config('services.stripe.key'),
+            'stripeReady' => StripeCheckoutService::configured(),
         ]);
     }
 }
