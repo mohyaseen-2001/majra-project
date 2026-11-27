@@ -6,6 +6,8 @@ use App\Models\Company;
 use App\Models\Payment;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
@@ -59,9 +61,19 @@ class StripeCheckoutService
 
             return $session['url'];
         } catch (\Throwable $exception) {
+            $stripeError = $exception instanceof RequestException ? $exception->response : null;
+            logger()->warning('Stripe checkout failed', [
+                'payment_id' => $payment->id,
+                'exception' => $exception::class,
+                'stripe_status' => $stripeError?->status(),
+                'stripe_error' => $stripeError?->json('error.code'),
+            ]);
             $payment->update(['status' => 'failed', 'metadata' => ['error' => 'checkout_session_unavailable']]);
             $subscription->update(['status' => 'failed']);
-            throw new RuntimeException('تعذر إنشاء جلسة الدفع التجريبية. لم يتم تفعيل الاشتراك.', previous: $exception);
+            $message = $exception instanceof ConnectionException
+                ? 'تعذّر الاتصال بخدمة Stripe. حاول الدفع مرة أخرى بعد عودة الاتصال.'
+                : 'تعذر إنشاء جلسة الدفع التجريبية. لم يتم تفعيل الاشتراك.';
+            throw new RuntimeException($message, previous: $exception);
         }
     }
 
