@@ -24,7 +24,7 @@ class StripeWebhookController extends Controller
 
         $event = $request->json()->all();
         if (($event['type'] ?? null) === 'checkout.session.completed') {
-            $checkout->completePaidSession($event['data']['object'] ?? []);
+            $checkout->completePaidSession($event['data']['object'] ?? [], is_int($event['created'] ?? null) ? $event['created'] : null);
         }
 
         return response()->noContent();

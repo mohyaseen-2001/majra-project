@@ -24,7 +24,8 @@ class StripeActivationTest extends TestCase
 
         $body = [
             'type' => 'checkout.session.completed',
-            'data' => ['object' => ['id' => 'cs_test_demo', 'mode' => 'subscription', 'payment_status' => 'paid']],
+            'created' => strtotime('2026-01-31 12:00:00 UTC'),
+            'data' => ['object' => ['id' => 'cs_test_demo', 'mode' => 'payment', 'payment_status' => 'paid']],
         ];
         $this->postJson('/api/stripe/webhook', $body)->assertStatus(400);
         $this->assertSame('pending', $subscription->fresh()->status);
@@ -35,10 +36,30 @@ class StripeActivationTest extends TestCase
         $this->postJson('/api/stripe/webhook', $body, $headers)->assertNoContent();
         $this->assertSame('paid', $payment->fresh()->status);
         $this->assertSame('active', $subscription->fresh()->status);
+        $this->assertSame('2026-01-31 12:00:00', $subscription->fresh()->starts_at->utc()->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-02-28 12:00:00', $subscription->fresh()->ends_at->utc()->format('Y-m-d H:i:s'));
 
         $startsAt = $subscription->fresh()->starts_at;
         $this->travel(10)->seconds();
         $this->postJson('/api/stripe/webhook', $body, $headers)->assertNoContent();
         $this->assertEquals($startsAt, $subscription->fresh()->starts_at);
+    }
+
+    public function test_company_cannot_start_checkout_during_a_paid_period(): void
+    {
+        $company = Company::factory()->create();
+        $company->user->update(['role' => 'company']);
+        $plan = SubscriptionPlan::create(['slug' => 'paid', 'name' => 'Paid', 'currency' => 'USD', 'price' => 19]);
+        $subscription = $company->subscriptions()->create([
+            'subscription_plan_id' => $plan->id, 'status' => 'active',
+            'starts_at' => now(), 'ends_at' => now()->addMonthNoOverflow(),
+        ]);
+        \Illuminate\Support\Facades\Http::preventStrayRequests();
+
+        $this->actingAs($company->user)->post(route('company.checkout'), ['plan_id' => $plan->id])
+            ->assertRedirect(route('company.subscription'))->assertSessionHas('info');
+        $this->get(route('company.subscription'))->assertOk()
+            ->assertSee($subscription->ends_at->timezone('Asia/Amman')->format('Y-m-d H:i'));
+        \Illuminate\Support\Facades\Http::assertNothingSent();
     }
 }

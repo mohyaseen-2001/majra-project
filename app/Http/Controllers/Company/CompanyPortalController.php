@@ -114,9 +114,7 @@ class CompanyPortalController extends Controller
 
     private function activeSubscription(Company $company): ?Subscription
     {
-        return $company->subscriptions()->with('plan')->where('status', 'active')
-            ->where(fn ($query) => $query->whereNull('starts_at')->orWhere('starts_at', '<=', now()))
-            ->where(fn ($query) => $query->whereNull('ends_at')->orWhere('ends_at', '>', now()))
+        return $company->subscriptions()->with('plan')->current()
             ->latest('starts_at')->latest('id')->first();
     }
 
@@ -179,7 +177,8 @@ class CompanyPortalController extends Controller
 
         return view('company.subscription', [
             'plans' => SubscriptionPlan::query()->where('is_active', true)->orderBy('price')->get(),
-            'subscription' => $company->subscriptions()->with('plan')->latest()->first(),
+            'subscription' => $this->activeSubscription($company) ?? $company->subscriptions()->with('plan')->latest('id')->first(),
+            'hasActivePaidSubscription' => $company->subscriptions()->current()->paidPlan()->exists(),
             'payments' => $company->payments()->latest()->limit(10)->get(),
             'stripeReady' => StripeCheckoutService::configured(),
         ]);

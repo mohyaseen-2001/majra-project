@@ -3,6 +3,9 @@
         <div class="citizen-heading"><div><span class="eyebrow">غرفة متابعة المؤسسات</span><h1>أهلاً، {{ $company->name }}</h1><p>ملخص المخاطر والإغلاقات في مناطق العمل التي اخترتها.</p></div><a class="button" href="{{ route('company.areas') }}">إدارة المناطق</a></div>
         <div class="ops-stats"><div class="ops-stat"><span>مناطق المتابعة</span><strong>{{ $areaCount }}</strong></div><div class="ops-stat"><span>إغلاقات نشطة في مناطقك</span><strong>{{ $closureCount }}</strong></div><div class="ops-stat"><span>الباقة</span><strong>{{ $activeSubscription?->plan?->name ?? 'مجانية / غير مفعلة' }}</strong></div></div>
         @if(session('success') || session('error') || session('info'))<div class="company-notice">{{ session('success') ?? session('error') ?? session('info') }}</div>@endif
+        @if($activeSubscription?->ends_at)
+            <p class="company-notice">نهاية الاشتراك <time datetime="{{ $activeSubscription->ends_at->toIso8601String() }}">{{ $activeSubscription->ends_at->timezone('Asia/Amman')->format('Y-m-d H:i') }}</time></p>
+        @endif
         @if($monitoring)
         <section class="ops-panel">
             <h2>تنبيهات مناطق المتابعة</h2>
@@ -14,7 +17,7 @@
                 @endforelse
             </div>
         </section>
-        <section class="ops-panel"><div class="citizen-heading"><div><h2>أحدث البلاغات في مناطقك</h2><p>تظهر البلاغات التي راجعها فريق مَجرى فقط.</p></div><a class="text-link" href="{{ route('company.reports') }}">كل التقارير ←</a></div>
+        <section class="ops-panel"><div class="citizen-heading"><div><h2>أحدث البلاغات في مناطقك</h2><p>تظهر هنا البلاغات المعتمدة آلياً أو من فريق مَجرى.</p></div><a class="text-link" href="{{ route('company.reports') }}">كل التقارير ←</a></div>
             <div class="company-list">@forelse($reports as $report)<a href="{{ route('reports.show', $report->public_id) }}"><span class="risk-tag risk-{{ $report->risk_level }}">{{ $report->risk_level }}</span><strong>{{ $report->title }}</strong><span>{{ $report->area_name }}</span><time>{{ $report->created_at->diffForHumans() }}</time></a>@empty<p>اختر مناطق متابعة من صفحة المناطق لعرض البلاغات المرتبطة بها.</p>@endforelse</div>
         </section>
         @else
