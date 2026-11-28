@@ -24,6 +24,10 @@ class OpenMeteoService
                 'timezone' => 'Asia/Amman',
             ])->throw()->json();
 
+            if (! is_array($response['current'] ?? null) || ! is_string($response['current']['time'] ?? null)) {
+                throw new \UnexpectedValueException('Open-Meteo response is missing current conditions.');
+            }
+
             $payload = [
                 'available' => true,
                 'source' => 'Open-Meteo',
@@ -66,7 +70,8 @@ class OpenMeteoService
             return null;
         }
 
-        $index = array_search($currentTime, $times, true);
+        $forecastHour = substr($currentTime, 0, 13).':00';
+        $index = array_search($forecastHour, $times, true);
 
         return $index === false || ! isset($values[$index]) ? null : (int) $values[$index];
     }
