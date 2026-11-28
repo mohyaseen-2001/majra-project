@@ -70,11 +70,12 @@ function englishText(text) {
         return part.replace(mixedPattern, label => mixedLabels[label]);
     }).join('');
 }
-const ignored = 'script, style, textarea, code, [translate="no"]';
+const ignored = 'script, style, code, [translate="no"]';
 const attributes = ['placeholder', 'aria-label', 'title'];
 let lang = localStorage.getItem('majra-language') === 'en' ? 'en' : 'ar';
 
 function translateText(node) {
+    if (node.parentElement?.closest('textarea')) return;
     const value = node.data;
     const saved = savedText.get(node);
     const source = saved && saved.rendered === value ? saved.source : value;
