@@ -30,7 +30,7 @@
     @vite('resources/js/maps.js')
     <script type="module">
         const L = window.L;
-        const majraReports = {{ Illuminate\Support\Js::from($reports->map(fn ($report) => ['lat' => (float) $report->latitude, 'lng' => (float) $report->longitude, 'title' => $report->title, 'area' => $report->area_name, 'risk' => $report->risk_level, 'status' => $report->status, 'url' => route('reports.show', $report->public_id)])) }};
+        const majraReports = {{ Illuminate\Support\Js::from($reports->map(fn ($report) => ['lat' => (float) $report->latitude, 'lng' => (float) $report->longitude, 'title' => $report->title, 'area' => $report->area_name, 'risk' => $report->risk_level, 'automatic' => $report->isAutomaticallyPublished(), 'status' => $report->status, 'url' => route('reports.show', $report->public_id)])) }};
         const majraClosures = {{ Illuminate\Support\Js::from($closures->map(fn ($closure) => ['lat' => (float) $closure->latitude, 'lng' => (float) $closure->longitude, 'title' => $closure->title, 'area' => $closure->area_name])) }};
         const map = L.map('majra-map', { scrollWheelZoom: false }).setView([31.2, 36.2], 7);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
@@ -39,6 +39,11 @@
             const node = document.createElement('div');
             const title = document.createElement('strong'); title.textContent = entry.title; node.append(title);
             const area = document.createElement('div'); area.textContent = entry.area || 'الأردن'; node.append(area);
+            if (entry.automatic) {
+                const source = document.createElement('div');
+                source.textContent = 'بلاغ مواطن · فحص آلي';
+                node.append(source);
+            }
             if (entry.url) { const link = document.createElement('a'); link.href = entry.url; link.textContent = 'تفاصيل البلاغ'; node.append(link); }
             L.circleMarker([entry.lat, entry.lng], { radius: 8, color, fillColor: color, fillOpacity: .82, weight: 2 }).addTo(map).bindPopup(node);
         };

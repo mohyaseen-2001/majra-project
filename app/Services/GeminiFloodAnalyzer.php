@@ -57,7 +57,7 @@ class GeminiFloodAnalyzer
                     'input' => [
                         [
                             'type' => 'text',
-                            'text' => 'افحص الصورة كمساعد لمراجع بشري في منصة سلامة عامة. لا تستنتج الموقع أو الوقت من الصورة. أعطِ توصية فقط ولا تعتمد البلاغ. أجب JSON وفق المخطط: هل تظهر مياه سيول أو تجمع مياه خطر؟ نوع المشهد ومستوى الخطر والثقة 0 إلى 1 وجودة وضوح الصورة 0 إلى 100 وملاحظة موجزة بالعربية. إذا لم تستطع الجزم فاختر false أو unknown بثقة منخفضة.',
+                            'text' => 'افحص الصورة وحدها لبلاغ سيول. لا تستنتج الموقع أو التاريخ. صنّف visible_flood عندما تظهر مياه سيول أو تجمع مياه خطر بوضوح. صنّف no_visible_hazard فقط عندما تُظهر صورة واضحة طريقاً أو مشهداً ذا صلة بدون خطر ظاهر. صنّف uncertain إذا كانت الصورة ضبابية أو مقتطعة أو غير ذات صلة أو تحتمل أكثر من تفسير. أعد مستوى الخطر والثقة بجوابك وجودة الصورة وملاحظة عربية. تجنب المبالغة في الثقة.',
                         ],
                         ['type' => 'image', 'data' => base64_encode($bytes), 'mime_type' => $mime],
                     ],
@@ -67,6 +67,7 @@ class GeminiFloodAnalyzer
                         'schema' => [
                             'type' => 'object',
                             'properties' => [
+                                'scene_decision' => ['type' => 'string', 'enum' => ['visible_flood', 'no_visible_hazard', 'uncertain']],
                                 'is_flood' => ['type' => 'boolean'],
                                 'hazard_type' => ['type' => 'string', 'enum' => ['flood', 'waterlogging', 'road_hazard', 'other', 'unknown']],
                                 'risk_level' => ['type' => 'string', 'enum' => ['unknown', 'low', 'medium', 'high', 'critical']],
@@ -74,7 +75,7 @@ class GeminiFloodAnalyzer
                                 'image_quality_score' => ['type' => 'integer', 'minimum' => 0, 'maximum' => 100],
                                 'notes' => ['type' => 'string'],
                             ],
-                            'required' => ['is_flood', 'hazard_type', 'risk_level', 'confidence', 'image_quality_score', 'notes'],
+                            'required' => ['scene_decision', 'is_flood', 'hazard_type', 'risk_level', 'confidence', 'image_quality_score', 'notes'],
                         ],
                     ],
                 ])->throw()->json();
@@ -83,6 +84,7 @@ class GeminiFloodAnalyzer
             $result = is_string($text) ? json_decode($text, true, flags: JSON_THROW_ON_ERROR) : null;
             if (! is_array($result)
                 || ! is_bool($result['is_flood'] ?? null)
+                || ! in_array($result['scene_decision'] ?? null, ['visible_flood', 'no_visible_hazard', 'uncertain'], true)
                 || ! in_array($result['hazard_type'] ?? null, ['flood', 'waterlogging', 'road_hazard', 'other', 'unknown'], true)
                 || ! in_array($result['risk_level'] ?? null, ['unknown', 'low', 'medium', 'high', 'critical'], true)
                 || ! is_numeric($result['confidence'] ?? null)
@@ -98,7 +100,23 @@ class GeminiFloodAnalyzer
                 'observations' => ['image_quality_score' => min(100, max(0, (int) $result['image_quality_score']))],
                 'admin_notes' => mb_substr((string) $result['notes'], 0, 2000), 'raw_response' => $text, 'checked_at' => now(),
             ]);
-            $report->update(['status' => 'ai_checked', 'risk_level' => $result['risk_level'], 'ai_checked_at' => now()]);
+            $clear = (float) $result['confidence'] >= 0.9 && $result['image_quality_score'] >= 70;
+            $canPublish = $clear && $result['scene_decision'] === 'visible_flood' && $result['is_flood']
+                && in_array($result['hazard_type'], ['flood', 'waterlogging'], true)
+                && in_array($result['risk_level'], ['low', 'medium', 'high', 'critical'], true);
+            $canDecline = $clear && $result['scene_decision'] === 'no_visible_hazard' && ! $result['is_flood']
+                && $result['hazard_type'] === 'other' && in_array($result['risk_level'], ['low', 'unknown'], true);
+            $status = $canPublish ? 'approved' : ($canDecline ? 'rejected' : 'ai_checked');
+
+            $report->newQuery()->whereKey($report->id)->whereIn('status', ['pending', 'ai_checked'])
+                ->where('expires_at', '>', now())
+                ->update([
+                    'status' => $status,
+                    'hazard_type' => $result['hazard_type'],
+                    'risk_level' => $result['risk_level'],
+                    'ai_checked_at' => now(),
+                ]);
+            $report->refresh();
 
             return $analysis;
         } catch (\Throwable $exception) {

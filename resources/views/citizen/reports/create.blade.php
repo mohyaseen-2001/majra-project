@@ -1,7 +1,7 @@
 <x-app-layout>
     <section class="citizen-page report-form-page">
         <a class="back-link" href="{{ route('map') }}">→ العودة للخريطة</a>
-        <div class="citizen-heading"><div><span class="eyebrow">بلاغ مدروس يساعد الجميع</span><h1>أرسل بلاغاً عن خطر</h1><p>أضف صورة واضحة وموقعاً دقيقاً. سيبقى البلاغ قيد المراجعة قبل ظهوره للعامة.</p></div><span class="privacy-note">الموقع يُستخدم لهذا البلاغ فقط</span></div>
+        <div class="citizen-heading"><div><span class="eyebrow">بلاغ مدروس يساعد الجميع</span><h1>أرسل بلاغاً عن خطر</h1><p>أضف صورة واضحة وموقعاً دقيقاً. يراجع الأدمن البلاغ إذا تعذّر حسم نتيجة فحص الصورة.</p></div><span class="privacy-note">الموقع يُستخدم لهذا البلاغ فقط</span></div>
         @if($errors->any())<div class="form-errors" role="alert">تحقق من الحقول المعلّمة ثم أعد الإرسال.</div>@endif
         <form class="report-form citizen-card" method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data">
             @csrf
@@ -13,7 +13,7 @@
                 <div class="form-field full"><div id="report-picker" class="picker-map" aria-label="اختر موقع البلاغ من الخريطة"></div><input type="hidden" name="latitude" id="report-lat" value="{{ old('latitude') }}"><input type="hidden" name="longitude" id="report-lng" value="{{ old('longitude') }}"><p class="coordinate-hint" id="coordinate-hint" role="status" aria-live="polite">يمكنك السماح للمتصفح بتحديد موقعك مرة واحدة عبر GPS، أو الضغط على نقطة في الخريطة. لن يُرسل الموقع إلا بعد إرسال البلاغ.</p></div>
                 <label class="form-field full"><span>صورة للموقع</span><input type="file" name="photo" id="report-photo" accept="image/jpeg,image/png,image/webp" required><small>JPG أو PNG أو WebP · حتى 8 ميغابايت</small><small class="field-error">@error('photo'){{ $message }}@enderror</small><img id="photo-preview" class="photo-preview" alt="معاينة الصورة المختارة" hidden></label>
             </div>
-            <div class="form-actions"><button class="button" type="submit">إرسال للمراجعة <span>←</span></button><span>لن تُمنح نقاط قبل اعتماد البلاغ.</span></div>
+            <div class="form-actions"><button class="button" type="submit">إرسال البلاغ <span>←</span></button></div>
         </form>
     </section>
     @vite('resources/js/maps.js')

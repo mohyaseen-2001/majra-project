@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Report extends Model
 {
+    public function isAutomaticallyPublished(): bool
+    {
+        return $this->source === 'citizen' && $this->ai_checked_at !== null && $this->reviewed_at === null
+            && in_array($this->status, ['approved', 'resolved'], true);
+    }
     use HasFactory;
 
     public const STATUSES = ['pending', 'ai_checked', 'approved', 'rejected', 'expired', 'resolved'];

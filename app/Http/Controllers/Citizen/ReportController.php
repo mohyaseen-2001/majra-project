@@ -87,8 +87,13 @@ class ReportController extends Controller
 
         $analyzer->analyze($report);
 
-        return redirect()->route('reports.show', $report->public_id)
-            ->with('success', 'وصل بلاغك إلى فريق المراجعة. سيظهر على الخريطة بعد التحقق منه.');
+        $message = match ($report->status) {
+            'approved' => 'نُشر بلاغك على الخريطة بعد فحص الصورة آلياً.',
+            'rejected' => 'لم يظهر خطر سيول في الصورة. يمكنك تقديم بلاغ جديد بصورة أوضح إذا استمر الخطر.',
+            default => 'وصل بلاغك إلى فريق المراجعة. سيظهر على الخريطة عند اعتماده.',
+        };
+
+        return redirect()->route('reports.show', $report->public_id)->with('success', $message);
     }
 
     public function show(Report $report): View

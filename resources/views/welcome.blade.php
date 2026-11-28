@@ -49,7 +49,7 @@
                     </div>
                     <div class="radar-footer">
                         <div><span class="footer-label">الطقس</span><strong>Open‑Meteo · افتح الخريطة</strong></div>
-                        <div><span class="footer-label">البلاغات</span><strong>مراجعة بشرية قبل النشر</strong></div>
+                        <div><span class="footer-label">البلاغات</span><strong>فحص آلي ومراجعة عند الحاجة</strong></div>
                         <div class="signal"><span class="signal-bars"><i></i><i></i><i></i><i></i></span><span>حالة المنصة</span></div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
             <div class="section-heading"><div><span class="eyebrow">منظومة واحدة، أدوار واضحة</span><h2>كل طرف يضيف <em>صورة أوضح</em></h2></div><span class="section-index">02 / 04</span></div>
             <div class="role-grid">
                 <article class="role-card role-citizen"><span class="role-number">01 / المواطن</span><span class="role-icon" aria-hidden="true">⌖</span><h3>بلّغ. تابع. خليك بأمان.</h3><p>شارك موقع الخطر وصورته، تابع حالة بلاغك، واطّلع على دليل السلامة.</p><span class="role-line"></span></article>
-                <article class="role-card role-ai"><span class="role-number">02 / التحقق</span><span class="role-icon" aria-hidden="true">◉</span><h3>تحقق يساعد المراجعة</h3><p>تحليل الصورة يعطي توصية ومؤشر ثقة؛ القرار النهائي يظل للمراجع البشري.</p><span class="role-line"></span></article>
+                <article class="role-card role-ai"><span class="role-number">02 / التحقق</span><span class="role-icon" aria-hidden="true">◉</span><h3>تحقق يساعد المراجعة</h3><p>يحلّل مَجرى الصورة وينشر البلاغات الواضحة، ويُحيل الحالات الملتبسة إلى فريق المراجعة.</p><span class="role-line"></span></article>
                 <article class="role-card role-ops"><span class="role-number">03 / العمليات</span><span class="role-icon" aria-hidden="true">⌘</span><h3>معلومة موثّقة، قرار أسرع</h3><p>الأدمن يراجع البلاغات ويدير التنبيهات وإغلاقات الطرق من لوحة واحدة.</p><span class="role-line"></span></article>
                 <article class="role-card role-company"><span class="role-number">04 / الشركات</span><span class="role-icon" aria-hidden="true">▤</span><h3>راقب مناطق عملك</h3><p>مساحات متابعة وتقارير مخاطر تساعد فرق التشغيل على الاستعداد.</p><span class="role-line"></span></article>
             </div>

@@ -12,7 +12,7 @@ class SafetyAssistantTest extends TestCase
         Http::preventStrayRequests();
 
         $this->postJson('/api/safety-assistant', ['question' => 'How do I submit a report?'])
-            ->assertOk()->assertJsonPath('answer', 'لإرسال بلاغ، سجّل الدخول كمواطن، افتح «أرسل بلاغاً»، أضف صورة التقطتها من مكان آمن، وحدد الموقع والوصف. يبقى البلاغ قيد المراجعة حتى يعتمده الفريق، ولا يُتتبع موقعك في الخلفية.');
+            ->assertOk()->assertJsonPath('answer', 'لإرسال بلاغ، سجّل الدخول كمواطن، افتح «أرسل بلاغاً»، أضف صورة التقطتها من مكان آمن، وحدد الموقع والوصف. يُحال البلاغ للمراجعة عند تعذّر حسم فحص الصورة، ولا يُتتبع موقعك في الخلفية.');
 
         Http::assertNothingSent();
     }
