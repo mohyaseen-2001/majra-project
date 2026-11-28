@@ -5,11 +5,43 @@ namespace Tests\Feature;
 use App\Models\Company;
 use App\Models\SubscriptionPlan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class StripeActivationTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_checkout_creates_one_card_session_and_reuses_it_until_expiration(): void
+    {
+        config(['services.stripe.secret' => 'sk_test_demo', 'services.stripe.webhook_secret' => 'whsec_demo']);
+        $company = Company::factory()->create();
+        $company->user->update(['role' => 'company']);
+        $plan = SubscriptionPlan::create(['slug' => 'paid', 'name' => 'Paid', 'currency' => 'USD', 'price' => 19]);
+        $other = SubscriptionPlan::create(['slug' => 'other', 'name' => 'Other', 'currency' => 'USD', 'price' => 39]);
+        $url = 'https://checkout.stripe.com/demo-session';
+        $session = ['id' => 'cs_test_demo', 'url' => $url, 'status' => 'open'];
+
+        Http::fake([
+            'https://api.stripe.com/v1/checkout/sessions/cs_test_demo' => Http::response($session),
+            'https://api.stripe.com/v1/checkout/sessions' => Http::response($session),
+        ]);
+
+        $this->actingAs($company->user)->post(route('company.checkout'), ['plan_id' => $plan->id])->assertRedirect($url);
+        $this->post(route('company.checkout'), ['plan_id' => $plan->id])->assertRedirect($url);
+        $this->post(route('company.checkout'), ['plan_id' => $other->id])
+            ->assertRedirect(route('company.subscription'))->assertSessionHas('error');
+
+        Http::assertSent(function (Request $request): bool {
+            parse_str($request->body(), $body);
+
+            return $request->method() === 'POST'
+                && ($body['mode'] ?? null) === 'payment' && ($body['allowed_payment_method_types'][0] ?? null) === 'card';
+        });
+        $this->assertDatabaseCount('payments', 1);
+        $this->assertDatabaseHas('payments', ['checkout_session_id' => 'cs_test_demo', 'amount' => 19, 'status' => 'pending']);
+    }
 
     public function test_only_a_signed_paid_session_activates_the_subscription_once(): void
     {
@@ -54,12 +86,12 @@ class StripeActivationTest extends TestCase
             'subscription_plan_id' => $plan->id, 'status' => 'active',
             'starts_at' => now(), 'ends_at' => now()->addMonthNoOverflow(),
         ]);
-        \Illuminate\Support\Facades\Http::preventStrayRequests();
+        Http::preventStrayRequests();
 
         $this->actingAs($company->user)->post(route('company.checkout'), ['plan_id' => $plan->id])
             ->assertRedirect(route('company.subscription'))->assertSessionHas('info');
         $this->get(route('company.subscription'))->assertOk()
             ->assertSee($subscription->ends_at->timezone('Asia/Amman')->format('Y-m-d H:i'));
-        \Illuminate\Support\Facades\Http::assertNothingSent();
+        Http::assertNothingSent();
     }
 }

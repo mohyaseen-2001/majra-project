@@ -58,7 +58,7 @@ class StripeCheckoutService
         $minorUnitAmount = (int) round(((float) $plan->price) * ($plan->currency === 'JOD' ? 1000 : 100));
         $params = [
             'mode' => 'payment',
-            'payment_method_types[0]' => 'card',
+            'allowed_payment_method_types[0]' => 'card',
             'expires_at' => now()->addMinutes(31)->timestamp,
             'success_url' => route('payment.success').'?session_id={CHECKOUT_SESSION_ID}',
             'cancel_url' => route('payment.cancel'),
