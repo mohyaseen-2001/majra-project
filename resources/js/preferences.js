@@ -116,7 +116,8 @@ const controls = document.createElement('div');
 controls.className = 'majra-preferences';
 controls.setAttribute('translate', 'no');
 controls.innerHTML = `<select aria-label="اللغة / Language"><option value="ar" lang="ar">العربية</option><option value="en" lang="en">English</option></select>
-    <button type="button"></button>`;
+    <button type="button" class="theme-toggle"></button>
+    <button type="button" class="weather-motion-toggle"></button>`;
 let bar = document.querySelector('.admin-topbar, .ops-nav, .site-header');
 if (!bar) {
     bar = document.createElement('nav');
@@ -125,7 +126,8 @@ if (!bar) {
 }
 bar.append(controls);
 const select = controls.querySelector('select');
-const themeButton = controls.querySelector('button');
+const themeButton = controls.querySelector('.theme-toggle');
+const motionButton = controls.querySelector('.weather-motion-toggle');
 
 function updateControls() {
     root.lang = lang;
@@ -134,9 +136,17 @@ function updateControls() {
     const dark = root.dataset.theme === 'dark';
     themeButton.textContent = dark ? '☀' : '☾';
     themeButton.setAttribute('aria-label', lang === 'en' ? (dark ? 'Switch to light mode' : 'Switch to dark mode') : (dark ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'));
+    const paused = root.dataset.weatherMotion === 'paused';
+    motionButton.textContent = paused ? '▶' : 'Ⅱ';
+    const motionLabel = lang === 'en'
+        ? (paused ? 'Play weather animation' : 'Pause weather animation')
+        : (paused ? 'تشغيل حركة الخلفية' : 'إيقاف حركة الخلفية');
+    motionButton.setAttribute('aria-label', motionLabel);
+    motionButton.title = motionLabel;
 }
 
 root.dataset.theme = localStorage.getItem('majra-theme') === 'light' ? 'light' : 'dark';
+root.dataset.weatherMotion = localStorage.getItem('majra-weather-motion') === 'paused' ? 'paused' : 'playing';
 updateControls();
 if (lang === 'en') translateTree(document.documentElement);
 select.addEventListener('change', () => {
@@ -148,6 +158,11 @@ select.addEventListener('change', () => {
 themeButton.addEventListener('click', () => {
     root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
     localStorage.setItem('majra-theme', root.dataset.theme);
+    updateControls();
+});
+motionButton.addEventListener('click', () => {
+    root.dataset.weatherMotion = root.dataset.weatherMotion === 'paused' ? 'playing' : 'paused';
+    localStorage.setItem('majra-weather-motion', root.dataset.weatherMotion);
     updateControls();
 });
 

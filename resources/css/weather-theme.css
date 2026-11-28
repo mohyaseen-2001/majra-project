@@ -1,0 +1,339 @@
+:root {
+    color-scheme: dark;
+    --scene-base: #07121f;
+    --scene-cloud: rgba(36, 110, 143, .36);
+    --scene-mist: rgba(79, 96, 172, .24);
+    --scene-rain: rgba(154, 215, 241, .24);
+    --scene-bolt: #b5cdf9;
+    --scene-water: rgba(73, 197, 219, .22);
+    --theme-ink: #eaf5fb;
+    --theme-muted: #a7becc;
+    --theme-accent: #75dfdf;
+    --theme-input: #102433;
+    --theme-focus: #7ce1ea;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+    --scene-base: #edf4f8;
+    --scene-cloud: rgba(76, 145, 185, .24);
+    --scene-mist: rgba(120, 128, 200, .18);
+    --scene-rain: rgba(39, 110, 151, .24);
+    --scene-bolt: #5b78ac;
+    --scene-water: rgba(26, 125, 155, .19);
+    --theme-ink: #172e41;
+    --theme-muted: #425d70;
+    --theme-accent: #075e70;
+    --theme-input: #f3f8fc;
+    --theme-focus: #006d85;
+    --theme-surface: #fff;
+    --theme-surface-soft: #e9f2f7;
+    --theme-border: #b8cbd7;
+    --night: var(--scene-base);
+    --night-soft: var(--theme-surface-soft);
+    --panel: var(--theme-surface);
+    --line: rgba(31, 69, 91, .22);
+    --muted: var(--theme-muted);
+    --white: var(--theme-ink);
+    --blue: #07647e;
+    --cyan: var(--theme-accent);
+    --amber: #855c12;
+    --orange: #963522;
+}
+
+body:has(> .weather-scene) {
+    isolation: isolate;
+    background: var(--scene-base);
+    color: var(--theme-ink);
+}
+
+body:has(> .weather-scene) :is(.majra-site, .ops-shell, .auth-shell) {
+    background: transparent;
+}
+
+.preferences-nav ~ .auth-shell {
+    min-height: calc(100svh - 52px);
+}
+
+.weather-scene {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--scene-base);
+}
+
+.weather-scene span {
+    position: absolute;
+    display: block;
+    pointer-events: none;
+}
+
+.weather-sky {
+    inset: -16%;
+    background:
+        radial-gradient(ellipse at 74% 8%, var(--scene-cloud), transparent 51%),
+        radial-gradient(ellipse at 18% 24%, var(--scene-mist), transparent 42%),
+        radial-gradient(ellipse at 60% 98%, var(--scene-water), transparent 60%);
+    animation: cloud-drift 28s ease-in-out infinite alternate;
+}
+
+.weather-rain {
+    inset: -128px;
+    background-image:
+        radial-gradient(ellipse 1px 13px at 19px 20px, var(--scene-rain) 20%, transparent 100%),
+        radial-gradient(ellipse 1px 8px at 67px 82px, var(--scene-rain) 20%, transparent 100%);
+    background-size: 96px 112px;
+    mask-image: linear-gradient(to bottom, #000, #0009 62%, transparent 95%);
+    animation: rain-drift 3.4s linear infinite;
+    opacity: .7;
+}
+
+.weather-lightning {
+    top: -4vh;
+    left: 12vw;
+    width: clamp(140px, 24vw, 330px);
+    height: clamp(220px, 45vh, 440px);
+    background: linear-gradient(145deg, transparent 5%, var(--scene-bolt) 28%, transparent 92%);
+    clip-path: polygon(53% 0, 56% 0, 40% 29%, 60% 26%, 39% 57%, 43% 56%, 24% 95%, 39% 60%, 34% 61%, 55% 30%, 35% 33%);
+    opacity: .18;
+    animation: lightning-glow 14s ease-in-out infinite;
+}
+
+.weather-water {
+    inset: auto -12% -12vh;
+    height: 43vh;
+    background:
+        repeating-radial-gradient(ellipse at 70% 128%, transparent 0 18px, var(--scene-water) 19px, transparent 21px 46px),
+        repeating-radial-gradient(ellipse at 18% 140%, transparent 0 28px, var(--scene-water) 29px, transparent 31px 64px);
+    mask-image: linear-gradient(transparent, #000 72%);
+    opacity: .5;
+    animation: water-drift 14s ease-in-out infinite alternate;
+}
+
+@keyframes cloud-drift {
+    from { transform: translate3d(-3%, -2%, 0) scale(1); }
+    to { transform: translate3d(5%, 4%, 0) scale(1.09); }
+}
+
+@keyframes rain-drift {
+    from { transform: rotate(13deg) translateY(0); }
+    to { transform: rotate(13deg) translateY(112px); }
+}
+
+@keyframes lightning-glow {
+    0%, 100% { opacity: .13; }
+    45%, 65% { opacity: .31; }
+}
+
+@keyframes water-drift {
+    from { transform: translate3d(-3%, 0, 0); }
+    to { transform: translate3d(4%, -5%, 0); }
+}
+
+:root[data-weather-motion="paused"] .weather-scene span {
+    animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .weather-scene span { animation: none; }
+    .majra-preferences .weather-motion-toggle { display: none; }
+}
+
+@media (max-width: 600px) {
+    .weather-lightning { left: 0; }
+    .weather-water { height: 36vh; }
+}
+
+.majra-preferences :is(.theme-toggle, .weather-motion-toggle) {
+    min-width: 36px;
+    padding-inline: .4rem;
+    line-height: 1;
+}
+
+:is(a, button, input, select, textarea, summary):focus-visible {
+    outline: 2px solid var(--theme-focus);
+    outline-offset: 3px;
+}
+
+:is(.auth-card, .form-field, .modal-field, .admin-search, .drawer-note) :is(input, select, textarea):focus-visible {
+    outline: 2px solid var(--theme-focus);
+    outline-offset: 2px;
+}
+
+.admin-table :is(th, td),
+:is(.modal-field, .admin-button, .row-action, .auth-card label) {
+    font-size: 12px;
+}
+
+:is(.majra-site, .ops-shell, .auth-shell, .admin-body) :is(.form-field, .modal-field, .admin-search, .chat-form, .auth-card) ::placeholder {
+    color: var(--theme-muted);
+    opacity: 1;
+}
+
+.auth-card input:not([type=checkbox]), .auth-card select {
+    text-align: start;
+}
+
+.chat-form button {
+    background: #076b73;
+    color: #fff;
+}
+
+:root[data-theme="light"] :is(.auth-card, .ops-panel, .ops-stat, .role-card, .weather-card, .hospital-card, .company-list, .chat-box, .admin-panel, .admin-sidebar, .admin-modal, .admin-drawer, .citizen-card, .report-card) {
+    background: var(--theme-surface);
+    color: var(--theme-ink);
+    border-color: var(--theme-border);
+    box-shadow: 0 10px 30px #2b536a12;
+}
+
+:root[data-theme="light"] :is(.ops-nav, .admin-topbar) {
+    background: #f5fafcf5;
+    color: var(--theme-ink);
+}
+
+:root[data-theme="light"] :is(.chat-head, .chat-bubble, .chat-suggestions button, .map-choice-button, .weather-card button:not(.button), .hospital-card button:not(.button), .admin-button.ghost, .row-action) {
+    background: var(--theme-surface-soft);
+    color: var(--theme-ink);
+    border-color: var(--theme-border);
+}
+
+:root[data-theme="light"] .form-field input::file-selector-button {
+    background: var(--theme-surface-soft);
+    color: var(--theme-ink);
+}
+
+:root[data-theme="light"] .admin-stat-card {
+    background: linear-gradient(145deg, var(--theme-surface), var(--theme-surface-soft));
+}
+
+:root[data-theme="light"] .radar-card {
+    --blue: #8bdbf4;
+    --cyan: #91e8e7;
+    --amber: #f4c675;
+}
+
+:root[data-theme="light"] .radar-card :is(.panel-time, .map-caption, .map-legend, .footer-label) {
+    color: #adc2d2;
+}
+
+:root[data-theme="light"] :is(.admin-menu-link > span, .chart-wrap svg text) {
+    color: var(--theme-muted);
+    fill: var(--theme-muted);
+}
+
+:root[data-theme="light"] :is(.admin-table th, .admin-table td, .company-list article, .company-list > a, .site-nav, .admin-menu-link, .admin-account) {
+    color: var(--theme-muted);
+}
+
+:root[data-theme="light"] .chat-bubble.user {
+    background: #ccebe9;
+    color: #164042;
+}
+
+:root[data-theme="light"] :is(.auth-card input:not([type=checkbox]), .auth-card select, .form-field input, .form-field textarea, .company-filters input, .company-filters select, .admin-search, .admin-search input, .admin-filters select, .modal-field input, .modal-field select, .modal-field textarea, .drawer-note textarea, .chat-form input) {
+    background: var(--theme-input);
+    border-color: var(--theme-border);
+    color: var(--theme-ink);
+}
+
+:root[data-theme="light"] :is(.profile-page, .profile-page h2, .profile-page h3, .profile-page p, .profile-page label, .profile-page input) {
+    color: var(--theme-ink) !important;
+}
+
+:root[data-theme="light"] .profile-page input {
+    background: var(--theme-input) !important;
+    border-color: var(--theme-border) !important;
+}
+
+:root[data-theme="light"] :is(.hero-lede, .hero-note, .brand small, .mission-strip p, .section-heading p, .role-card p, .role-number, .site-footer, .auth-card label, .auth-subtitle, .auth-footnote, .auth-brand > a:last-child, .public-lead, .public-sections p, .citizen-heading p, .ops-heading p, .ops-panel p, .ops-stat span, .ops-nav-links, .ops-user, .ops-user small, .map-legend, .ops-card p, .mini-alert p, .mini-alert small, .road-list small, .report-card-body > p, .report-card-meta, .report-detail-meta, .pagination-wrap nav, .form-field, .form-field small, .form-actions > span, .empty-state, .company-shortcuts p, .company-hint, .company-list time, .company-list article > span, .company-form .form-field span, .company-filters label, .current-plan p, .plan-price small, .plan-card ul, .weather-card small, .weather-card > div > span, .hospital-card small, .chat-head small, .topbar-kicker, .admin-account small, .admin-account button, .sidebar-label, .sidebar-bottom, .sidebar-bottom a, .service-heartbeat small, .admin-stat-card small, .admin-stat-card > span, .admin-welcome p, .admin-page-intro p, .panel-header small, .panel-badge, .recent-copy small, .service-grid small, .pulse-indicator small, .table-footer, .modal-head small, .drawer-head small, .drawer-body dt, .drawer-note, .false-report-flag, .modal-field) {
+    color: var(--theme-muted);
+}
+
+:root[data-theme="light"] :is(.hero-note b, .role-card h3, .public-sections h2, .ops-stat strong, .weather-card strong, .hospital-card strong, .admin-welcome h1, .admin-page-intro h1, .admin-stat-card strong, .panel-header h2, .recent-copy strong, .service-grid strong, .report-cell-title strong, .drawer-body dd, .sidebar-toggle, .modal-close),
+:root[data-theme="light"] #drawer-close {
+    color: var(--theme-ink);
+}
+
+:root[data-theme="light"] :is(.modal-head h2, .drawer-head h2, .mini-alert strong, .closure-row strong) {
+    color: var(--theme-ink);
+}
+
+:root[data-theme="light"] .report-cell-title {
+    color: var(--theme-ink) !important;
+}
+
+:root[data-theme="light"] :is(.citizen-card p, .closure-row small, .closure-row span, .panel-header p, .ai-result p, .ai-result small) {
+    color: var(--theme-muted);
+}
+
+:root[data-theme="light"] .report-cell-title::after {
+    color: var(--theme-muted);
+}
+
+:root[data-theme="light"] :is(.ai-result strong, .admin-menu-link.active > span) {
+    color: var(--theme-accent);
+}
+
+:root[data-theme="light"] :is(.admin-button.danger, .auth-card .field-error, .form-field .field-error) {
+    color: #963522;
+}
+
+:root[data-theme="light"] :is(.text-link, .privacy-note, .map-choice-button, .company-hint code, .pulse-indicator strong, .success-banner, .company-notice) {
+    color: var(--theme-accent);
+}
+
+:root[data-theme="light"] :is(.button, .admin-button.primary, .map-locate) {
+    background: #dceef2;
+    border-color: #71a2ae;
+    color: #124758;
+}
+
+:root[data-theme="light"] :is(.button, .admin-button.primary, .map-locate):hover:not(:disabled) {
+    background: #c8e4ec;
+}
+
+:is(.button, .admin-button, .map-locate):disabled {
+    cursor: not-allowed;
+    opacity: .7;
+}
+
+:root[data-theme="light"] .status-pill {
+    color: var(--theme-muted);
+    background-color: var(--theme-surface-soft);
+}
+
+:root[data-theme="light"] :is(.status-pending, .severity-warning, .risk-medium, .risk-text.risk-medium, .pulse-warning strong) {
+    color: #805407;
+    background-color: #fff1d4;
+}
+
+:root[data-theme="light"] :is(.severity-critical, .risk-critical, .risk-high, .status-rejected, .status-expired, .field-error, .form-errors, .row-delete, .pulse-danger strong) {
+    color: #963522;
+}
+
+:root[data-theme="light"] :is(.severity-info, .risk-low, .status-approved, .status-resolved, .source-tag, .admin-status, .admin-menu-link.active, .admin-menu-link:hover) {
+    color: #145a60;
+    background-color: #e1f0f1;
+}
+
+:root[data-theme="light"] .risk-unknown {
+    color: #435d70;
+    background-color: #e9f0f5;
+}
+
+:root[data-theme="light"] :is(.leaflet-container, .leaflet-popup-content-wrapper, .leaflet-popup-tip) {
+    background: #f5fafc;
+    color: #172e41;
+}
+
+.leaflet-popup-content a {
+    color: var(--theme-accent);
+    text-decoration: underline;
+}
+
+:root[data-theme="light"] .report-photo {
+    background: #dceaf2;
+    color: var(--theme-accent);
+}
