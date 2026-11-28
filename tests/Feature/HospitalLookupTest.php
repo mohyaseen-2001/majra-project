@@ -7,19 +7,19 @@ use Tests\TestCase;
 
 class HospitalLookupTest extends TestCase
 {
-    public function test_secondary_overpass_instance_is_used_when_primary_fails(): void
+    public function test_nearby_hospitals_are_loaded_locally_and_sorted_by_distance(): void
     {
         Http::preventStrayRequests();
-        Http::fake([
-            'https://overpass-api.de/*' => Http::response(status: 406),
-            'https://overpass.private.coffee/*' => Http::response(['elements' => [
-                ['id' => 12, 'lat' => 31.95, 'lon' => 35.91, 'tags' => ['name' => 'Example Hospital']],
-            ]]),
-        ]);
 
-        $this->getJson('/api/hospitals?latitude=31.95&longitude=35.91')
-            ->assertOk()->assertJsonPath('data.0.name', 'Example Hospital');
+        $response = $this->getJson('/api/hospitals?latitude=31.9539&longitude=35.9106&radius_km=15')
+            ->assertOk()->assertJsonPath('source', 'OpenStreetMap / HOT')->assertJsonPath('stale', true);
+        $distances = array_column($response->json('data'), 'distance_km');
+        $this->assertNotEmpty($distances);
+        $this->assertLessThanOrEqual(15, max($distances));
+        $sorted = $distances;
+        sort($sorted, SORT_NUMERIC);
+        $this->assertSame($sorted, $distances);
 
-        Http::assertSentCount(2);
+        Http::assertNothingSent();
     }
 }

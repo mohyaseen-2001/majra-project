@@ -1,0 +1,1077 @@
+{
+    "source": "OpenStreetMap / HOT",
+    "source_url": "https://data.humdata.org/dataset/hotosm_jor_health_facilities",
+    "license": "ODbL-1.0",
+    "license_url": "https://www.openstreetmap.org/copyright",
+    "updated_at": "2026-11-03T00:00:00Z",
+    "hospitals": [
+        {
+            "id": "node/10315720419",
+            "name": "مركز صحي فوعرا",
+            "latitude": 32.615105,
+            "longitude": 35.764132
+        },
+        {
+            "id": "node/1076050960",
+            "name": "المستشفى الاستشاري",
+            "latitude": 31.965633,
+            "longitude": 35.88617
+        },
+        {
+            "id": "node/1076073263",
+            "name": "مستشفى شميساني",
+            "latitude": 31.970061,
+            "longitude": 35.89396
+        },
+        {
+            "id": "node/10872863117",
+            "name": "Al-JazeeraHospital",
+            "latitude": 31.979072,
+            "longitude": 35.898941
+        },
+        {
+            "id": "node/12045708330",
+            "name": "مركز أميمة الطبي",
+            "latitude": 32.006571,
+            "longitude": 35.884286
+        },
+        {
+            "id": "node/12373038198",
+            "name": "مركز الموقر الصحي",
+            "latitude": 31.814702,
+            "longitude": 36.100106
+        },
+        {
+            "id": "node/12407137260",
+            "name": "المدينة مركز صحي",
+            "latitude": 31.723794,
+            "longitude": 35.795365
+        },
+        {
+            "id": "node/12407214757",
+            "name": "Health Center",
+            "latitude": 32.032053,
+            "longitude": 35.723681
+        },
+        {
+            "id": "node/12826212234",
+            "name": "صيدلية جروان",
+            "latitude": 32.063113,
+            "longitude": 35.708466
+        },
+        {
+            "id": "node/12886287304",
+            "name": "مستشفى الشرق الزرقاء",
+            "latitude": 32.04666,
+            "longitude": 36.117346
+        },
+        {
+            "id": "node/13296455145",
+            "name": "Dar Al Salam Hospital",
+            "latitude": 31.953391,
+            "longitude": 35.852908
+        },
+        {
+            "id": "node/13624903401",
+            "name": "مستشفى الأميرة بسمة",
+            "latitude": 32.529803,
+            "longitude": 35.829267
+        },
+        {
+            "id": "node/13637786072",
+            "name": "مركز صحي سمر الاولي",
+            "latitude": 32.677234,
+            "longitude": 35.786623
+        },
+        {
+            "id": "node/13709149025",
+            "name": "مستشفى الخيل",
+            "latitude": 31.858144,
+            "longitude": 35.897319
+        },
+        {
+            "id": "node/13774628101",
+            "name": "Hospital01",
+            "latitude": 32.208724,
+            "longitude": 35.723211
+        },
+        {
+            "id": "node/1784439854",
+            "name": "المستشفى الإيطالى",
+            "latitude": 31.186506,
+            "longitude": 35.70196
+        },
+        {
+            "id": "node/1858598060",
+            "name": "Jordan University Hospital",
+            "latitude": 32.00463,
+            "longitude": 35.874967
+        },
+        {
+            "id": "node/1923534186",
+            "name": "مستشفى العيون التخصصي أمي",
+            "latitude": 31.997544,
+            "longitude": 35.872378
+        },
+        {
+            "id": "node/1927951368",
+            "name": "Abu Nuseir Health Center",
+            "latitude": 32.052705,
+            "longitude": 35.882024
+        },
+        {
+            "id": "node/2177028754",
+            "name": "مستشفى الجندويل للتوليد",
+            "latitude": 31.957766,
+            "longitude": 35.845397
+        },
+        {
+            "id": "node/2511416942",
+            "name": "مركز البادية الشمالية الشامل",
+            "latitude": 32.266287,
+            "longitude": 36.455661
+        },
+        {
+            "id": "node/2511417182",
+            "name": "مستشفى البادية الشمالية",
+            "latitude": 32.265706,
+            "longitude": 36.457056
+        },
+        {
+            "id": "node/3319607397",
+            "name": "مستشفى ماركا العسكري",
+            "latitude": 31.981759,
+            "longitude": 35.990037
+        },
+        {
+            "id": "node/3319607438",
+            "name": "مركز ماركا الصحي",
+            "latitude": 31.973562,
+            "longitude": 35.974239
+        },
+        {
+            "id": "node/3899055911",
+            "name": "مشفى الأمير فيصل",
+            "latitude": 32.030467,
+            "longitude": 36.046254
+        },
+        {
+            "id": "node/3992599616",
+            "name": "المركز الصحي",
+            "latitude": 32.337743,
+            "longitude": 36.246545
+        },
+        {
+            "id": "node/4139592464",
+            "name": "مستشفى الحكمة",
+            "latitude": 32.053825,
+            "longitude": 36.093762
+        },
+        {
+            "id": "node/4200543590",
+            "name": "مستشفى الامل",
+            "latitude": 31.973417,
+            "longitude": 35.910956
+        },
+        {
+            "id": "node/4201615774",
+            "name": "Baby Cord",
+            "latitude": 31.747647,
+            "longitude": 35.940667
+        },
+        {
+            "id": "node/4209730508",
+            "name": "Pharmacy One",
+            "latitude": 31.911401,
+            "longitude": 35.915
+        },
+        {
+            "id": "node/4220680909",
+            "name": "مستشفى",
+            "latitude": 32.066681,
+            "longitude": 36.097065
+        },
+        {
+            "id": "node/4228221592",
+            "name": "مركز صحي محي الاولي",
+            "latitude": 30.986764,
+            "longitude": 35.860137
+        },
+        {
+            "id": "node/4304602996",
+            "name": "Gardens",
+            "latitude": 31.985769,
+            "longitude": 35.878401
+        },
+        {
+            "id": "node/4449445617",
+            "name": "مستشفى الحمايده",
+            "latitude": 31.901481,
+            "longitude": 35.933972
+        },
+        {
+            "id": "node/4546727390",
+            "name": "Al Mowasah Hospital",
+            "latitude": 31.979724,
+            "longitude": 35.978135
+        },
+        {
+            "id": "node/4617738093",
+            "name": "مستشفى معان الحكومي",
+            "latitude": 30.191001,
+            "longitude": 35.728438
+        },
+        {
+            "id": "node/4631910691",
+            "name": "مستشفى الحياة",
+            "latitude": 31.947386,
+            "longitude": 35.895403
+        },
+        {
+            "id": "node/4631910891",
+            "name": "مستشفى الحياة العام هبة الله",
+            "latitude": 31.921453,
+            "longitude": 35.903119
+        },
+        {
+            "id": "node/4649251789",
+            "name": "مستشفى هبة للولادة",
+            "latitude": 31.96796,
+            "longitude": 35.917065
+        },
+        {
+            "id": "node/4795820944",
+            "name": "مركز صحي مخيم جرش",
+            "latitude": 32.263956,
+            "longitude": 35.85755
+        },
+        {
+            "id": "node/4864275521",
+            "name": "الحسين لسر طان",
+            "latitude": 32.005234,
+            "longitude": 35.873825
+        },
+        {
+            "id": "node/5097488474",
+            "name": "مركز صحي وقاص/ وكالة الغوث UNRWA",
+            "latitude": 32.543399,
+            "longitude": 35.608812
+        },
+        {
+            "id": "node/5109951221",
+            "name": "مستشفى الرويال",
+            "latitude": 31.988784,
+            "longitude": 35.917317
+        },
+        {
+            "id": "node/5109951223",
+            "name": "مستشفى الاستقلال",
+            "latitude": 31.979638,
+            "longitude": 35.916253
+        },
+        {
+            "id": "node/5606496742",
+            "name": "مركز صحي سال",
+            "latitude": 32.571177,
+            "longitude": 35.911758
+        },
+        {
+            "id": "node/5606554765",
+            "name": "مركز صحي عرجان",
+            "latitude": 32.396175,
+            "longitude": 35.733521
+        },
+        {
+            "id": "node/5606628584",
+            "name": "مركز صحي حنينا",
+            "latitude": 32.57036,
+            "longitude": 35.860017
+        },
+        {
+            "id": "node/5606628597",
+            "name": "مركز صحي حنينا",
+            "latitude": 32.570366,
+            "longitude": 35.860012
+        },
+        {
+            "id": "node/5606632674",
+            "name": "hospital",
+            "latitude": 32.394158,
+            "longitude": 35.584153
+        },
+        {
+            "id": "node/5606636764",
+            "name": "مستشفى الرمثا الحكومي",
+            "latitude": 32.566201,
+            "longitude": 36.016397
+        },
+        {
+            "id": "node/5606637254",
+            "name": "مركز صحي الصريح",
+            "latitude": 32.511328,
+            "longitude": 35.895055
+        },
+        {
+            "id": "node/5606648997",
+            "name": "مركز صحي سهل حوران الشامل",
+            "latitude": 32.638622,
+            "longitude": 35.96761
+        },
+        {
+            "id": "node/5606667147",
+            "name": "مركز صحي زوبيا",
+            "latitude": 32.432635,
+            "longitude": 35.770968
+        },
+        {
+            "id": "node/5606667148",
+            "name": "منزل مصطفى غوانمه",
+            "latitude": 32.431109,
+            "longitude": 35.773013
+        },
+        {
+            "id": "node/5606667150",
+            "name": "بلدية زوبيا",
+            "latitude": 32.432443,
+            "longitude": 35.771248
+        },
+        {
+            "id": "node/5606667152",
+            "name": "مدرسة زوبيا الثانوية للبنين",
+            "latitude": 32.424336,
+            "longitude": 35.785592
+        },
+        {
+            "id": "node/5606667153",
+            "name": "مدرسة زوبيا الاساسية للبنين",
+            "latitude": 32.435006,
+            "longitude": 35.765007
+        },
+        {
+            "id": "node/5606667154",
+            "name": "منزل محمد مصطفى غوانمه",
+            "latitude": 32.430929,
+            "longitude": 35.772816
+        },
+        {
+            "id": "node/5606667155",
+            "name": "منزل عبدالله مصطفى غوانمه",
+            "latitude": 32.430765,
+            "longitude": 35.772594
+        },
+        {
+            "id": "node/5606667156",
+            "name": "مدرسة زوبيا الثانوية للبنات",
+            "latitude": 32.434111,
+            "longitude": 35.770151
+        },
+        {
+            "id": "node/5606732707",
+            "name": "مركز صحي كفريوبا الشامل",
+            "latitude": 32.540579,
+            "longitude": 35.801449
+        },
+        {
+            "id": "node/5606740202",
+            "name": "مركز صحي دير يوسف",
+            "latitude": 32.484794,
+            "longitude": 35.804097
+        },
+        {
+            "id": "node/5606743380",
+            "name": "مركز صحي الطره الجنوبي",
+            "latitude": 32.636297,
+            "longitude": 35.98859
+        },
+        {
+            "id": "node/5606743381",
+            "name": "مركز صحي الطره الشمالي",
+            "latitude": 32.646361,
+            "longitude": 35.992828
+        },
+        {
+            "id": "node/5606753002",
+            "name": "مركز صحي راسون",
+            "latitude": 32.401157,
+            "longitude": 35.757498
+        },
+        {
+            "id": "node/5606755367",
+            "name": "مركز كفرخا الصحي",
+            "latitude": 32.357561,
+            "longitude": 35.882704
+        },
+        {
+            "id": "node/5606758859",
+            "name": "مركز بيت يافا الصحي",
+            "latitude": 32.519013,
+            "longitude": 35.783221
+        },
+        {
+            "id": "node/5606766134",
+            "name": "مركز حكما",
+            "latitude": 32.591434,
+            "longitude": 35.883318
+        },
+        {
+            "id": "node/5606771826",
+            "name": "مركز صحي دير يوسف",
+            "latitude": 32.48491,
+            "longitude": 35.804238
+        },
+        {
+            "id": "node/5606773941",
+            "name": "المركز الصحي الشرقي",
+            "latitude": 32.542285,
+            "longitude": 36.007458
+        },
+        {
+            "id": "node/5606773942",
+            "name": "المركز الصحي الغربي",
+            "latitude": 32.559771,
+            "longitude": 36.000423
+        },
+        {
+            "id": "node/5606774198",
+            "name": "مركز صحي",
+            "latitude": 32.370954,
+            "longitude": 35.739886
+        },
+        {
+            "id": "node/5606786962",
+            "name": "مركز صحي جديتا",
+            "latitude": 32.408904,
+            "longitude": 35.70221
+        },
+        {
+            "id": "node/5606787140",
+            "name": "مركز صحي عرجان",
+            "latitude": 32.370954,
+            "longitude": 35.739886
+        },
+        {
+            "id": "node/5913248686",
+            "name": "Kerak Hospital",
+            "latitude": 31.147304,
+            "longitude": 35.725364
+        },
+        {
+            "id": "node/6055154820",
+            "name": "العيادة",
+            "latitude": 31.99357,
+            "longitude": 36.017222
+        },
+        {
+            "id": "node/6412459378",
+            "name": "مستشفى الحنان",
+            "latitude": 31.909147,
+            "longitude": 35.928977
+        },
+        {
+            "id": "node/6470225416",
+            "name": "Istishari Hospital",
+            "latitude": 31.966078,
+            "longitude": 35.886735
+        },
+        {
+            "id": "node/6486661571",
+            "name": "Marka Specialty Hospital",
+            "latitude": 31.98439,
+            "longitude": 35.990329
+        },
+        {
+            "id": "node/6572051785",
+            "name": "صيدليه البيروني",
+            "latitude": 31.951721,
+            "longitude": 35.905469
+        },
+        {
+            "id": "node/6771282186",
+            "name": "مستشفى القدس",
+            "latitude": 31.925898,
+            "longitude": 35.927829
+        },
+        {
+            "id": "node/6812101533",
+            "name": "Aqaba Modern Hospital",
+            "latitude": 29.546471,
+            "longitude": 35.017574
+        },
+        {
+            "id": "node/7128129139",
+            "name": "المستشفى الإيطالي",
+            "latitude": 31.944731,
+            "longitude": 35.932084
+        },
+        {
+            "id": "node/7282077301",
+            "name": "الحذاء الإيطالي",
+            "latitude": 32.53453,
+            "longitude": 35.862627
+        },
+        {
+            "id": "node/7327173386",
+            "name": "Irbid Specialty Hospital",
+            "latitude": 32.53359,
+            "longitude": 35.862599
+        },
+        {
+            "id": "node/7390377610",
+            "name": "مركز صحي زحر",
+            "latitude": 32.562544,
+            "longitude": 35.780483
+        },
+        {
+            "id": "node/7468749889",
+            "name": "مركز صحي زحر",
+            "latitude": 32.562827,
+            "longitude": 35.780396
+        },
+        {
+            "id": "node/9297593802",
+            "name": "DENTALINE ORTHODONTICS",
+            "latitude": 31.953547,
+            "longitude": 35.90068
+        },
+        {
+            "id": "node/9297631403",
+            "name": "مركز الدكتور طارق شعلان لطب وتقويم الأسنان",
+            "latitude": 31.953428,
+            "longitude": 35.900683
+        },
+        {
+            "id": "node/9368070837",
+            "name": "PROJECT SITE",
+            "latitude": 32.501828,
+            "longitude": 35.999022
+        },
+        {
+            "id": "node/9592824073",
+            "name": "مركز صحي كفرعان",
+            "latitude": 32.550529,
+            "longitude": 35.761194
+        },
+        {
+            "id": "node/9594254673",
+            "name": "مركز  صحي المشيرفة",
+            "latitude": 32.369662,
+            "longitude": 35.972445
+        },
+        {
+            "id": "node/9606499144",
+            "name": "مركز صحي الهاشميه الأولي",
+            "latitude": 32.364221,
+            "longitude": 35.65833
+        },
+        {
+            "id": "node/9647821337",
+            "name": "مستشفى أبن النفيس",
+            "latitude": 32.536044,
+            "longitude": 35.867479
+        },
+        {
+            "id": "node/9647821344",
+            "name": "مستشفى أبن النفيس",
+            "latitude": 32.535936,
+            "longitude": 35.86688
+        },
+        {
+            "id": "node/9835333506",
+            "name": "Al-Kindi Hospital",
+            "latitude": 31.968899,
+            "longitude": 35.912041
+        },
+        {
+            "id": "relation/8603356",
+            "name": "Annoor Sanatorium",
+            "latitude": 32.3645,
+            "longitude": 36.201578
+        },
+        {
+            "id": "way/1041880924",
+            "name": "مركز الصحي الشامل كفرنجه",
+            "latitude": 32.300855,
+            "longitude": 35.708001
+        },
+        {
+            "id": "way/1041882020",
+            "name": "مركز الصحي كفرنجه",
+            "latitude": 32.300855,
+            "longitude": 35.707993
+        },
+        {
+            "id": "way/1041882025",
+            "name": "مركز صحي ابدر الشامل",
+            "latitude": 32.662387,
+            "longitude": 35.786774
+        },
+        {
+            "id": "way/1042041062",
+            "name": "مركز صحي كفرعان",
+            "latitude": 32.550497,
+            "longitude": 35.761216
+        },
+        {
+            "id": "way/1042143554",
+            "name": "مركز صحي صيدور الفرعي",
+            "latitude": 32.613404,
+            "longitude": 35.694238
+        },
+        {
+            "id": "way/1042223935",
+            "name": "مركز صحي المشيرفة",
+            "latitude": 32.369649,
+            "longitude": 35.972476
+        },
+        {
+            "id": "way/1042341861",
+            "name": "مركز صحي الاستقلال",
+            "latitude": 32.294832,
+            "longitude": 35.702192
+        },
+        {
+            "id": "way/1043523671",
+            "name": "مركز صحي كفرالماء",
+            "latitude": 32.482899,
+            "longitude": 35.701819
+        },
+        {
+            "id": "way/1043860460",
+            "name": "مركز صحي الرازي",
+            "latitude": 32.278383,
+            "longitude": 35.832908
+        },
+        {
+            "id": "way/1076371530",
+            "name": "اراضي مستشفى االيرموك",
+            "latitude": 32.639395,
+            "longitude": 35.83781
+        },
+        {
+            "id": "way/1115721536",
+            "name": "pharmacy",
+            "latitude": 32.033198,
+            "longitude": 35.729227
+        },
+        {
+            "id": "way/1116065564",
+            "name": "مستشفى السلط الحكومي",
+            "latitude": 32.036341,
+            "longitude": 35.733747
+        },
+        {
+            "id": "way/1210350659",
+            "name": "Prince Hussein Hospital",
+            "latitude": 32.083032,
+            "longitude": 35.836887
+        },
+        {
+            "id": "way/1217646926",
+            "name": "مركز صحي الطيبة",
+            "latitude": 31.879611,
+            "longitude": 35.921084
+        },
+        {
+            "id": "way/1217647109",
+            "name": "مركز صحي وكالة الغوث",
+            "latitude": 31.881444,
+            "longitude": 35.923723
+        },
+        {
+            "id": "way/1218398058",
+            "name": "مركز البراء الطبي",
+            "latitude": 31.876678,
+            "longitude": 35.929847
+        },
+        {
+            "id": "way/1219095253",
+            "name": "مركز صحي الجويدة الحكومي",
+            "latitude": 31.891772,
+            "longitude": 35.923676
+        },
+        {
+            "id": "way/1219796989",
+            "name": "مركز الإسراء الطبي",
+            "latitude": 31.870559,
+            "longitude": 35.925836
+        },
+        {
+            "id": "way/1225272705",
+            "name": "H1",
+            "latitude": 32.32482,
+            "longitude": 36.164623
+        },
+        {
+            "id": "way/1225767873",
+            "name": "مستشفى بديعه",
+            "latitude": 32.529157,
+            "longitude": 35.832513
+        },
+        {
+            "id": "way/1225890996",
+            "name": "الشفاء",
+            "latitude": 31.951085,
+            "longitude": 35.926437
+        },
+        {
+            "id": "way/1328043329",
+            "name": "مستشفى الأمير حمزة",
+            "latitude": 31.983421,
+            "longitude": 35.938932
+        },
+        {
+            "id": "way/1333180216",
+            "name": "مركز صحي جديتا",
+            "latitude": 32.408885,
+            "longitude": 35.702409
+        },
+        {
+            "id": "way/1341608633",
+            "name": "مستشفى الملكة علياء العسكري",
+            "latitude": 31.99983,
+            "longitude": 35.918897
+        },
+        {
+            "id": "way/1385384390",
+            "name": "مستشفى السلط الجديد",
+            "latitude": 32.062137,
+            "longitude": 35.707329
+        },
+        {
+            "id": "way/1496672678",
+            "name": "مستشفى المملكة (صندوق الإستثمار السعودي الاردني",
+            "latitude": 31.854543,
+            "longitude": 35.900516
+        },
+        {
+            "id": "way/1532937237",
+            "name": "مستشفى الاميرة هيا العسكري",
+            "latitude": 32.344143,
+            "longitude": 35.819345
+        },
+        {
+            "id": "way/179095761",
+            "name": "مستشفى عمان",
+            "latitude": 31.953628,
+            "longitude": 35.911822
+        },
+        {
+            "id": "way/200921049",
+            "name": "مستشفى الأردن",
+            "latitude": 31.960705,
+            "longitude": 35.899346
+        },
+        {
+            "id": "way/200945989",
+            "name": "مستشفى عاقلة",
+            "latitude": 31.951875,
+            "longitude": 35.909855
+        },
+        {
+            "id": "way/232959301",
+            "name": "Luzmilla Hospital",
+            "latitude": 31.954873,
+            "longitude": 35.930534
+        },
+        {
+            "id": "way/236541916",
+            "name": "بسمة",
+            "latitude": 32.55804,
+            "longitude": 35.839312
+        },
+        {
+            "id": "way/243771939",
+            "name": "مستشفى المفرق الحكومي",
+            "latitude": 32.343938,
+            "longitude": 36.197854
+        },
+        {
+            "id": "way/261427306",
+            "name": "المستشفى المغربي",
+            "latitude": 32.302401,
+            "longitude": 36.322727
+        },
+        {
+            "id": "way/261427310",
+            "name": "MSF Hospital",
+            "latitude": 32.292581,
+            "longitude": 36.329168
+        },
+        {
+            "id": "way/261427315",
+            "name": "Cbm",
+            "latitude": 32.293615,
+            "longitude": 36.326665
+        },
+        {
+            "id": "way/261427318",
+            "name": "المستشفى الايطالي",
+            "latitude": 32.302211,
+            "longitude": 36.322199
+        },
+        {
+            "id": "way/261427323",
+            "name": "LWF",
+            "latitude": 32.293781,
+            "longitude": 36.330553
+        },
+        {
+            "id": "way/261427337",
+            "name": "مركز المراة",
+            "latitude": 32.299315,
+            "longitude": 36.320035
+        },
+        {
+            "id": "way/261427339",
+            "name": "اطباء حول العالم",
+            "latitude": 32.296798,
+            "longitude": 36.319422
+        },
+        {
+            "id": "way/261427341",
+            "name": "Nour Hussein",
+            "latitude": 32.294866,
+            "longitude": 36.321394
+        },
+        {
+            "id": "way/261427346",
+            "name": "عيادات شاملة",
+            "latitude": 32.293548,
+            "longitude": 36.32998
+        },
+        {
+            "id": "way/261427348",
+            "name": "اطباء حول العالم",
+            "latitude": 32.29398,
+            "longitude": 36.331149
+        },
+        {
+            "id": "way/261427392",
+            "name": "عيادات الهيئة الطبية الدولية",
+            "latitude": 32.294137,
+            "longitude": 36.330716
+        },
+        {
+            "id": "way/261427409",
+            "name": "عيادة الاحتياجات الخاصة",
+            "latitude": 32.293628,
+            "longitude": 36.330986
+        },
+        {
+            "id": "way/261427413",
+            "name": "المركز السعودي",
+            "latitude": 32.296546,
+            "longitude": 36.319322
+        },
+        {
+            "id": "way/261427439",
+            "name": "المستشفى السعودي",
+            "latitude": 32.292416,
+            "longitude": 36.330213
+        },
+        {
+            "id": "way/261427449",
+            "name": "JHAS عيادات شاملة",
+            "latitude": 32.299064,
+            "longitude": 36.32054
+        },
+        {
+            "id": "way/271264346",
+            "name": "IFRC Hospital",
+            "latitude": 31.909164,
+            "longitude": 36.570854
+        },
+        {
+            "id": "way/271264347",
+            "name": "IMC Clinic",
+            "latitude": 31.899202,
+            "longitude": 36.59477
+        },
+        {
+            "id": "way/272552531",
+            "name": "IMC - International Medical Corps",
+            "latitude": 32.298987,
+            "longitude": 36.336532
+        },
+        {
+            "id": "way/273206714",
+            "name": "Health Post - Village 5",
+            "latitude": 31.903324,
+            "longitude": 36.57992
+        },
+        {
+            "id": "way/273206716",
+            "name": "Health Post - Village 3",
+            "latitude": 31.907884,
+            "longitude": 36.597189
+        },
+        {
+            "id": "way/274372357",
+            "name": "مستشفى الاسراء",
+            "latitude": 32.016998,
+            "longitude": 35.865995
+        },
+        {
+            "id": "way/276753162",
+            "name": "المركز العربي الطبي",
+            "latitude": 31.95952,
+            "longitude": 35.878389
+        },
+        {
+            "id": "way/310759541",
+            "name": "مستشفى الهلال الاحمر الاردني",
+            "latitude": 31.935096,
+            "longitude": 35.933111
+        },
+        {
+            "id": "way/310759913",
+            "name": "مستشفى البشير",
+            "latitude": 31.93963,
+            "longitude": 35.940837
+        },
+        {
+            "id": "way/310784026",
+            "name": "Al Mu'ashshir Hospital",
+            "latitude": 31.966228,
+            "longitude": 35.91149
+        },
+        {
+            "id": "way/310787518",
+            "name": "مستشفى ملحس",
+            "latitude": 31.949454,
+            "longitude": 35.922241
+        },
+        {
+            "id": "way/310801172",
+            "name": "مستشفى الخالدي",
+            "latitude": 31.951796,
+            "longitude": 35.903115
+        },
+        {
+            "id": "way/325285398",
+            "name": "مستشفى ماركا العسكري",
+            "latitude": 31.981171,
+            "longitude": 35.989548
+        },
+        {
+            "id": "way/325285407",
+            "name": "مركز ماركا الصحي",
+            "latitude": 31.973719,
+            "longitude": 35.974107
+        },
+        {
+            "id": "way/325883144",
+            "name": "Shmeisani Hospital",
+            "latitude": 31.969996,
+            "longitude": 35.893861
+        },
+        {
+            "id": "way/370396344",
+            "name": "الهيئة الطبية الدولية",
+            "latitude": 32.299071,
+            "longitude": 36.336513
+        },
+        {
+            "id": "way/380007075",
+            "name": "King Hussein Medical City",
+            "latitude": 31.978889,
+            "longitude": 35.82814
+        },
+        {
+            "id": "way/386566454",
+            "name": "مشفى الأمير فيصل",
+            "latitude": 32.033447,
+            "longitude": 36.046778
+        },
+        {
+            "id": "way/544218525",
+            "name": "AMR Health Clinic",
+            "latitude": 32.292324,
+            "longitude": 36.312996
+        },
+        {
+            "id": "way/544227362",
+            "name": "AMR Clinic 2",
+            "latitude": 32.284951,
+            "longitude": 36.325053
+        },
+        {
+            "id": "way/546637585",
+            "name": "Jabal Amman Hospital",
+            "latitude": 31.9542,
+            "longitude": 35.900373
+        },
+        {
+            "id": "way/546639083",
+            "name": "مستشفى الإسلامي",
+            "latitude": 31.967265,
+            "longitude": 35.908638
+        },
+        {
+            "id": "way/589900332",
+            "name": "مستشفى فلسطين",
+            "latitude": 31.97421,
+            "longitude": 35.907052
+        },
+        {
+            "id": "way/604006169",
+            "name": "مجمع العرقوسي الطبي",
+            "latitude": 31.977407,
+            "longitude": 35.902966
+        },
+        {
+            "id": "way/607437839",
+            "name": "مستشفى الأمير راشد العسكري",
+            "latitude": 32.503287,
+            "longitude": 35.865408
+        },
+        {
+            "id": "way/612832217",
+            "name": "مستشفى التخصصي",
+            "latitude": 31.97888,
+            "longitude": 35.900184
+        },
+        {
+            "id": "way/653341258",
+            "name": "Tla`a al ali hospital",
+            "latitude": 31.998369,
+            "longitude": 35.863682
+        },
+        {
+            "id": "way/675199522",
+            "name": "Avrillaud",
+            "latitude": 31.93776,
+            "longitude": 35.864152
+        },
+        {
+            "id": "way/744873441",
+            "name": "Jordan University Hospital",
+            "latitude": 32.006869,
+            "longitude": 35.874576
+        },
+        {
+            "id": "way/776692021",
+            "name": "hospital",
+            "latitude": 32.6976,
+            "longitude": 35.842932
+        },
+        {
+            "id": "way/967687896",
+            "name": "Al Hussain New Salt Hospital",
+            "latitude": 32.062177,
+            "longitude": 35.708127
+        },
+        {
+            "id": "way/993834976",
+            "name": "مستشفى جبل الزيتون",
+            "latitude": 32.037698,
+            "longitude": 36.091929
+        },
+        {
+            "id": "way/996590849",
+            "name": "King Hussein Cancer Center",
+            "latitude": 32.004541,
+            "longitude": 35.876519
+        }
+    ]
+}

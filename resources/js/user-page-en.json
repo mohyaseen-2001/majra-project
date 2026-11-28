@@ -1,4 +1,8 @@
 {
+  "المستشفيات المعروضة": "Hospitals shown",
+  "مواقع من OpenStreetMap. حالة التشغيل قد تتغيّر.": "Locations from OpenStreetMap. Operating status may change.",
+  "حالة التشغيل غير متحقّق منها": "Operating status unverified",
+  "ما في مستشفيات مسجّلة ضمن هذا النطاق. جرّب تحريك الخريطة.": "No hospitals are listed in this area. Try moving the map.",
   "أضف صورة واضحة وموقعاً دقيقاً. يراجع الأدمن البلاغ إذا تعذّر حسم نتيجة فحص الصورة.": "Add a clear photo and an accurate location. An administrator reviews the report if the photo check is inconclusive.",
   "إرسال البلاغ": "Submit report",
   "تظهر هنا البلاغات المعتمدة آلياً أو من فريق مَجرى.": "This page shows reports approved automatically or by the Majra team.",

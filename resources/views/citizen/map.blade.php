@@ -7,7 +7,7 @@
         <div class="map-legend" aria-label="مفتاح الخريطة">
             <span><i class="legend-dot danger"></i> خطر مرتفع</span><span><i class="legend-dot caution"></i> تنبيه</span><span><i class="legend-dot closure"></i> إغلاق طريق</span><span class="map-count">{{ $reports->count() }} بلاغاً موثّقاً</span>
         </div>
-        <div class="map-data-strip"><article class="weather-card"><span class="weather-symbol">☂</span><div><small>طقس عمّان · <span id="weather-source">Open-Meteo</span></small><strong id="weather-main">جارٍ جلب آخر تحديث…</strong><span id="weather-extra">إذا تعذّر المصدر ستظهر آخر بيانات محفوظة.</span></div><button type="button" id="weather-refresh">تحديث</button></article><article class="hospital-card"><div><strong>مستشفيات قريبة</strong><small id="hospital-status" role="status" aria-live="polite">مصدر مفتوح من OpenStreetMap وقد تكون بياناته غير مكتملة.</small><small id="location-status" role="status" aria-live="polite"></small><a id="hospital-fallback" class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=hospitals" target="_blank" rel="noopener noreferrer" hidden>ابحث عن المستشفيات في خرائط Google</a></div><button type="button" class="button button-small" id="hospitals-load">اعرض حول مركز الخريطة</button></article></div>
+        <div class="map-data-strip"><article class="weather-card"><span class="weather-symbol">☂</span><div><small>طقس عمّان · <span id="weather-source">Open-Meteo</span></small><strong id="weather-main">جارٍ جلب آخر تحديث…</strong><span id="weather-extra">إذا تعذّر المصدر ستظهر آخر بيانات محفوظة.</span></div><button type="button" id="weather-refresh">تحديث</button></article><article class="hospital-card"><div><strong>مستشفيات قريبة</strong><small id="hospital-status" role="status" aria-live="polite">مواقع من OpenStreetMap. حالة التشغيل قد تتغيّر.</small><small id="hospital-source" hidden><a class="text-link" href="https://data.humdata.org/dataset/hotosm_jor_health_facilities" target="_blank" rel="noopener noreferrer">OpenStreetMap / HOT</a> · <time></time></small><small id="location-status" role="status" aria-live="polite"></small><a id="hospital-fallback" class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=hospitals" target="_blank" rel="noopener noreferrer" hidden>ابحث عن المستشفيات في خرائط Google</a></div><button type="button" class="button button-small" id="hospitals-load">اعرض حول مركز الخريطة</button></article></div>
         <div id="majra-map" class="leaflet-map" aria-label="خريطة الأردن والبلاغات"></div>
         <div class="citizen-grid map-lower-grid">
             <section class="citizen-card"><div class="card-heading"><span class="card-icon">!</span><div><h2>التنبيهات الحالية</h2><p>المصدر والوقت ظاهرين مع كل تنبيه</p></div></div>
@@ -32,7 +32,7 @@
         const L = window.L;
         const majraReports = {{ Illuminate\Support\Js::from($reports->map(fn ($report) => ['lat' => (float) $report->latitude, 'lng' => (float) $report->longitude, 'title' => $report->title, 'area' => $report->area_name, 'risk' => $report->risk_level, 'automatic' => $report->isAutomaticallyPublished(), 'status' => $report->status, 'url' => route('reports.show', $report->public_id)])) }};
         const majraClosures = {{ Illuminate\Support\Js::from($closures->map(fn ($closure) => ['lat' => (float) $closure->latitude, 'lng' => (float) $closure->longitude, 'title' => $closure->title, 'area' => $closure->area_name])) }};
-        const map = L.map('majra-map', { scrollWheelZoom: false }).setView([31.2, 36.2], 7);
+        const map = L.map('majra-map', { scrollWheelZoom: false }).setView([31.9539, 35.9106], 7);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '&copy; OpenStreetMap contributors' }).addTo(map);
         const marker = (entry, type) => {
             const color = type === 'closure' ? '#a78bfa' : (entry.risk === 'high' ? '#fb654f' : '#f3bc55');
@@ -58,14 +58,37 @@
             } catch { main.textContent='الطقس غير متاح حالياً'; extra.textContent='ستظهر آخر بيانات محفوظة عند توفرها.'; }
         };
         document.getElementById('weather-refresh').addEventListener('click',loadWeather); loadWeather();
+        const hospitalMarkers = L.layerGroup().addTo(map);
+        const hospitalIcon = L.divIcon({ className: 'hospital-pin', html: '+', iconSize: [24, 24] });
+        const hospitalSource = document.getElementById('hospital-source');
         document.getElementById('hospitals-load').addEventListener('click',async(event)=>{
             const button=event.currentTarget; button.disabled=true; document.getElementById('hospital-status').textContent='جارٍ البحث حول مركز الخريطة…';
             const center=map.getCenter();
             try {
                 document.getElementById('hospital-fallback').hidden = true;
+                hospitalSource.hidden = true;
+                hospitalMarkers.clearLayers();
                 const {data}=await window.axios.get('/api/hospitals',{params:{latitude:center.lat,longitude:center.lng,radius_km:15}});
-                data.data.forEach((place)=>{const node=document.createElement('div');const name=document.createElement('strong');name.textContent=place.name;node.append(name);if(place.phone){const phone=document.createElement('div');phone.textContent=place.phone;node.append(phone);}L.marker([place.latitude,place.longitude]).addTo(map).bindPopup(node);});
-                document.getElementById('hospital-status').textContent=`${data.data.length} نتيجة · ${data.source} · ${data.stale?'بيانات محفوظة':'تحديث '+data.updated_at}`;
+                const formatDistance = new Intl.NumberFormat(document.documentElement.lang, { style: 'unit', unit: 'kilometer', maximumFractionDigits: 1 });
+                data.data.forEach((place) => {
+                    const popup = document.createElement('div');
+                    const name = document.createElement('strong');
+                    name.textContent = place.name;
+                    const distance = document.createElement('div');
+                    distance.textContent = formatDistance.format(place.distance_km);
+                    const availability = document.createElement('small');
+                    availability.textContent = 'حالة التشغيل غير متحقّق منها';
+                    popup.append(name, distance, availability);
+                    L.marker([place.latitude, place.longitude], { icon: hospitalIcon, title: place.name })
+                        .addTo(hospitalMarkers).bindPopup(popup);
+                });
+                const status = document.getElementById('hospital-status');
+                status.textContent = data.data.length ? `المستشفيات المعروضة · ${data.data.length}` : 'ما في مستشفيات مسجّلة ضمن هذا النطاق. جرّب تحريك الخريطة.';
+                document.getElementById('hospital-fallback').hidden = data.data.length > 0;
+                const date = hospitalSource.querySelector('time');
+                date.dateTime = data.updated_at;
+                date.textContent = data.updated_at.slice(0, 10);
+                hospitalSource.hidden = false;
             } catch {
                 document.getElementById('hospital-status').textContent = 'تعذر جلب المستشفيات. راجع المصادر الرسمية عند الحاجة.';
                 document.getElementById('hospital-fallback').hidden = false;

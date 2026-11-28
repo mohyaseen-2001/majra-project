@@ -81,7 +81,7 @@ Keep API keys and payment secrets in the ignored local `.env` file. Never commit
 
 - Gemini report analysis is optional. Set `GEMINI_API_KEY` in `.env`; manual review remains available when the integration is not configured.
 - Stripe is optional and should use test credentials for local development: `STRIPE_SECRET` and `STRIPE_WEBHOOK_SECRET`. For local testing, run `stripe listen --events checkout.session.completed --forward-to http://127.0.0.1:8000/api/stripe/webhook` with the same Stripe test account. Set the signing secret printed by the listener in `.env` and keep the listener running during checkout. The signed webhook activates the subscription.
-- Weather data uses Open-Meteo. Nearby hospital information uses OpenStreetMap/Overpass.
+- Weather data uses Open-Meteo. Nearby hospital locations are matched locally against a snapshot of the [HOT Jordan Health Facilities export](https://data.humdata.org/dataset/hotosm_jor_health_facilities). The bundled data is dated 2026-11-03 and is licensed under [ODbL 1.0 by OpenStreetMap contributors](https://www.openstreetmap.org/copyright). The snapshot uses named facilities tagged as hospitals and represents polygons with the average of their exterior coordinates.
 
 ## Tests
 

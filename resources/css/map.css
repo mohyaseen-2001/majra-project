@@ -8,3 +8,15 @@
 .weather-card button:not(.button),.hospital-card button { flex:0 0 auto; border:1px solid rgba(70,188,207,.2); border-radius:5px; padding:7px 9px; background:rgba(48,153,172,.08); color:#a8e8ed; font:inherit; font-size:9px; cursor:pointer; }
 .hospital-card button:disabled { opacity:.55; cursor:wait; }
 @media(max-width:700px) { .map-data-strip { grid-template-columns:1fr; }.weather-card,.hospital-card { align-items:flex-start; flex-wrap:wrap; }.weather-card button,.hospital-card button { margin-inline-start:auto; } }
+.hospital-pin {
+    display: grid;
+    place-items: center;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #087f83;
+    color: #fff;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: 0 2px 5px #0005;
+}
