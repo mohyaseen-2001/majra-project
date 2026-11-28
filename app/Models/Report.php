@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +11,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Report extends Model
 {
+    #[Scope]
+    protected function publiclyVisible(Builder $query): void
+    {
+        $query->where(fn (Builder $visible) => $visible->where('status', 'resolved')
+            ->orWhere(fn (Builder $active) => $active->where('status', 'approved')
+                ->where(fn (Builder $date) => $date->whereNull('expires_at')->orWhere('expires_at', '>', now()))));
+    }
+
+    public function isPubliclyVisible(): bool
+    {
+        return $this->status === 'resolved'
+            || ($this->status === 'approved' && (! $this->expires_at || $this->expires_at->isFuture()));
+    }
+
     public function isAutomaticallyPublished(): bool
     {
         return $this->source === 'citizen' && $this->ai_checked_at !== null && $this->reviewed_at === null

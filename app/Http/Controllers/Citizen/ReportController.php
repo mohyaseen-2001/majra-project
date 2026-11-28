@@ -19,7 +19,7 @@ class ReportController extends Controller
 {
     public function map(): View
     {
-        $reports = Report::query()->whereIn('status', ['approved', 'resolved'])
+        $reports = Report::query()->publiclyVisible()
             ->with('media')->latest()->limit(300)->get();
 
         return view('citizen.map', [
@@ -35,7 +35,7 @@ class ReportController extends Controller
 
     public function index(): View
     {
-        $reports = Report::query()->whereIn('status', ['approved', 'resolved'])
+        $reports = Report::query()->publiclyVisible()
             ->with(['user:id,name', 'media'])->latest()->paginate(5);
 
         return view('citizen.feed', compact('reports'));
@@ -99,7 +99,7 @@ class ReportController extends Controller
     public function show(Report $report): View
     {
         abort_unless(
-            in_array($report->status, ['approved', 'resolved'], true)
+            $report->isPubliclyVisible()
             || $report->user_id === auth()->id()
             || auth()->user()?->hasRole('admin'),
             404,

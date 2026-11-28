@@ -31,7 +31,7 @@ class CompanyPortalController extends Controller
         $activeSubscription = $this->activeSubscription($company);
         $monitoring = (float) ($activeSubscription?->plan?->price ?? 0) > 0;
         $monitoredAreas = $monitoring ? $areas : collect();
-        $reports = $this->inAreas(Report::query()->whereIn('status', ['approved', 'resolved']), $monitoredAreas)
+        $reports = $this->inAreas(Report::query()->publiclyVisible(), $monitoredAreas)
             ->latest()->limit(6)->get();
         $alerts = Alert::query()->where('is_active', true)
             ->whereIn('area_name', $monitoredAreas->where('alerts_enabled', true)->pluck('area_name'))
@@ -96,7 +96,7 @@ class CompanyPortalController extends Controller
             'from' => ['nullable', 'date'],
             'to' => ['nullable', 'date', 'after_or_equal:from'],
         ]);
-        $query = $this->inAreas(Report::query()->whereIn('status', ['approved', 'resolved']), $areas);
+        $query = $this->inAreas(Report::query()->publiclyVisible(), $areas);
         if (! empty($filters['risk_level'])) {
             $query->where('risk_level', $filters['risk_level']);
         }
