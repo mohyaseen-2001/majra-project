@@ -32,6 +32,7 @@ Route::middleware(['auth', 'role:company'])->prefix('company')->name('company.')
     Route::post('/areas', [CompanyPortalController::class, 'storeArea'])->name('areas.store');
     Route::delete('/areas/{area}', [CompanyPortalController::class, 'destroyArea'])->name('areas.destroy');
     Route::get('/reports', [CompanyPortalController::class, 'reports'])->name('reports');
+    Route::get('/operations', [CompanyPortalController::class, 'operations'])->name('operations');
     Route::get('/subscription', [CompanyPortalController::class, 'subscription'])->name('subscription');
     Route::post('/checkout', [CheckoutController::class, 'start'])->name('checkout');
 });

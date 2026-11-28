@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class CompanyPortalController extends Controller
@@ -29,7 +30,7 @@ class CompanyPortalController extends Controller
         $company = $this->company($request);
         $areas = $company->areas;
         $activeSubscription = $this->activeSubscription($company);
-        $monitoring = (float) ($activeSubscription?->plan?->price ?? 0) > 0;
+        $monitoring = $this->hasPaidPlan($activeSubscription);
         $monitoredAreas = $monitoring ? $areas : collect();
         $reports = $this->inAreas(Report::query()->publiclyVisible(), $monitoredAreas)
             ->latest()->limit(6)->get();
@@ -43,10 +44,10 @@ class CompanyPortalController extends Controller
             'company' => $company,
             'areaCount' => $areas->count(),
             'reports' => $reports,
-            'closureCount' => $this->inAreas(RoadClosure::query()->where('status', 'active')
-                ->where(fn ($query) => $query->whereNull('ends_at')->orWhere('ends_at', '>', now())), $monitoredAreas)->count(),
+            'closureCount' => $this->inAreas(RoadClosure::query()->currentlyActive(), $monitoredAreas)->count(),
             'activeSubscription' => $activeSubscription,
             'monitoring' => $monitoring,
+            'hasOperations' => $this->hasOperations($activeSubscription),
             'alerts' => $alerts,
         ]);
     }
@@ -80,6 +81,9 @@ class CompanyPortalController extends Controller
     public function destroyArea(Request $request, CompanyArea $area): RedirectResponse
     {
         abort_unless($area->company_id === $this->company($request)->id, 404);
+        if (! $this->canMonitor($request)) {
+            return $this->monitoringRequired();
+        }
         $area->delete();
 
         return back()->with('success', 'تم حذف المنطقة من قائمة المتابعة.');
@@ -87,10 +91,12 @@ class CompanyPortalController extends Controller
 
     public function reports(Request $request): View|RedirectResponse
     {
-        if (! $this->canMonitor($request)) {
+        $company = $this->company($request);
+        $subscription = $this->activeSubscription($company);
+        if (! $this->hasPaidPlan($subscription)) {
             return $this->monitoringRequired();
         }
-        $areas = $this->company($request)->areas;
+        $areas = $company->areas;
         $filters = $request->validate([
             'risk_level' => ['nullable', 'in:low,medium,high,critical,unknown'],
             'from' => ['nullable', 'date'],
@@ -107,9 +113,52 @@ class CompanyPortalController extends Controller
             $query->whereDate('created_at', '<=', $filters['to']);
         }
         $reports = $query->with('media')->latest()->paginate(5)->withQueryString();
-        $closures = $this->inAreas(RoadClosure::query(), $areas)->latest()->limit(30)->get();
+        $closures = $this->inAreas(RoadClosure::query()->currentlyActive(), $areas)->latest()->paginate(5, ['*'], 'closures_page')->withQueryString();
+        $hasOperations = $this->hasOperations($subscription);
 
-        return view('company.reports', compact('reports', 'closures'));
+        return view('company.reports', compact('reports', 'closures', 'hasOperations'));
+    }
+
+    public function operations(Request $request): View|RedirectResponse
+    {
+        $company = $this->company($request);
+        $subscription = $this->activeSubscription($company);
+        if (! $this->hasPaidPlan($subscription)) {
+            return $this->monitoringRequired();
+        }
+        if (! $this->hasOperations($subscription)) {
+            return redirect()->route('company.subscription')
+                ->with('info', 'سجل الإغلاقات السابقة والملخص التشغيلي متاحان ضمن باقة العمليات.');
+        }
+
+        $filters = $request->validate([
+            'area' => ['nullable', 'integer'],
+            'from' => ['nullable', 'required_with:to', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'to' => ['nullable', 'required_with:from', 'date_format:Y-m-d', 'after_or_equal:from', 'before_or_equal:today'],
+        ]);
+        $areas = $company->areas()->orderBy('area_name')->get();
+        $selectedArea = $filters['area'] ?? null;
+        $selectedAreas = $selectedArea === null ? $areas : $areas->where('id', $selectedArea);
+        abort_if($selectedArea !== null && $selectedAreas->isEmpty(), 404);
+        $from = $filters['from'] ?? today()->subDays(29)->toDateString();
+        $to = $filters['to'] ?? today()->toDateString();
+
+        $closureDate = DB::raw('COALESCE(starts_at, created_at)');
+        $closureQuery = $this->inAreas(RoadClosure::query()->historical(), $selectedAreas)
+            ->whereDate($closureDate, '>=', $from)->whereDate($closureDate, '<=', $to);
+        $mostAffected = (clone $closureQuery)->select('area_name')->selectRaw('COUNT(*) as total')
+            ->groupBy('area_name')->orderByDesc('total')->orderBy('area_name')->first();
+        $closures = $closureQuery->orderByRaw('COALESCE(starts_at, created_at) DESC')->orderByDesc('id')
+            ->paginate(5)->withQueryString();
+
+        $reportQuery = $this->inAreas(Report::query()->publiclyVisible(), $selectedAreas)
+            ->whereDate('created_at', '>=', $from)->whereDate('created_at', '<=', $to);
+        $reportCount = (clone $reportQuery)->count();
+        $highRiskCount = $reportQuery->whereIn('risk_level', ['high', 'critical'])->count();
+
+        return view('company.operations', compact(
+            'areas', 'selectedArea', 'from', 'to', 'closures', 'mostAffected', 'reportCount', 'highRiskCount',
+        ));
     }
 
     private function activeSubscription(Company $company): ?Subscription
@@ -120,7 +169,17 @@ class CompanyPortalController extends Controller
 
     private function canMonitor(Request $request): bool
     {
-        return (float) ($this->activeSubscription($this->company($request))?->plan?->price ?? 0) > 0;
+        return $this->hasPaidPlan($this->activeSubscription($this->company($request)));
+    }
+
+    private function hasPaidPlan(?Subscription $subscription): bool
+    {
+        return (float) ($subscription?->plan?->price ?? 0) > 0;
+    }
+
+    private function hasOperations(?Subscription $subscription): bool
+    {
+        return $this->hasPaidPlan($subscription) && $subscription?->plan?->slug === 'operations';
     }
 
     private function monitoringRequired(): RedirectResponse

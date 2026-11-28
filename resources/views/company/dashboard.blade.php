@@ -24,5 +24,8 @@
             <p class="company-notice">اختر اشتراكاً مدفوعاً لتفعيل متابعة المناطق والتنبيهات.</p>
         @endif
         <div class="company-shortcuts"><a class="citizen-card" href="{{ route('company.reports') }}"><span class="eyebrow">الرصد</span><h2>البلاغات والإغلاقات</h2><p>فلترة حسب مستوى الخطر والتاريخ.</p></a><a class="citizen-card" href="{{ route('company.subscription') }}"><span class="eyebrow">الخدمات</span><h2>الباقات والفوترة</h2><p>إدارة الاشتراك التجريبي وسجل الدفعات.</p></a></div>
+        @if($hasOperations)
+            <p><a class="button button-small" href="{{ route('company.operations') }}">سجل الإغلاقات والملخص التشغيلي</a></p>
+        @endif
     </section>
 </x-app-layout>

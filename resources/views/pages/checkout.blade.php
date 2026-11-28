@@ -14,7 +14,7 @@
     <main class="citizen-page public-page">
         <span class="eyebrow">اشتراك الشركات</span>
         <h1>إتمام الاشتراك</h1>
-        <p class="public-lead">تتم المدفوعات عبر Stripe Checkout في وضع الاختبار بعد تسجيل الدخول بحساب شركة.</p>
+        <p class="public-lead">سجّل الدخول بحساب شركة للمتابعة إلى الدفع التجريبي. ما رح ينخصم منك مبلغ حقيقي.</p>
         @guest
             <a class="button" href="{{ route('register') }}">إنشاء حساب شركة</a>
         @else
