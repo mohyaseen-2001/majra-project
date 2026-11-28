@@ -4,6 +4,9 @@ const rows = document.getElementById('resource-rows');
 if (rows && window.majraAdminResource) {
     const config = window.majraAdminResource;
     const modal = document.getElementById('resource-modal');
+    modal.querySelectorAll('[data-resource-close]').forEach(button => {
+        button.addEventListener('click', () => modal.close());
+    });
     const form = document.getElementById('resource-form');
     const fieldBox = document.getElementById('resource-fields');
     const toast = document.getElementById('admin-toast');
@@ -17,7 +20,11 @@ if (rows && window.majraAdminResource) {
         'contact-status': [['new','جديد'],['read','مقروء'],['replied','تم الرد'],['archived','مؤرشف']], interval: [['month','شهري'],['year','سنوي']],
     };
     const notify = (message, error = false) => { toast.textContent = message; toast.classList.toggle('error', error); toast.classList.add('visible'); setTimeout(() => toast.classList.remove('visible'), 3200); };
-    const labelFor = (type, value) => selectValues[type]?.find(([key]) => String(key) === String(value))?.[1] || (typeof value === 'boolean' ? (value ? 'نعم' : 'لا') : (value ?? '—'));
+    const dateFormatter = new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Amman' });
+    const labelFor = (type, value) => {
+        if (type === 'datetime-local' && value) return dateFormatter.format(new Date(value));
+        return selectValues[type]?.find(([key]) => String(key) === String(value))?.[1] || (typeof value === 'boolean' ? (value ? 'نعم' : 'لا') : (value ?? '—'));
+    };
     const load = async () => {
         rows.innerHTML = '<tr><td colspan="8">جارٍ التحميل…</td></tr>';
         try {
@@ -47,7 +54,10 @@ if (rows && window.majraAdminResource) {
             }
             let value=item?.[key] ?? '';
             if(type==='lines') value=Array.isArray(value)?value.join('\n'):value;
-            if(type==='datetime-local'&&value) value=new Date(value).toISOString().slice(0,16);
+            if (type === 'datetime-local' && value) {
+                const date = new Date(value);
+                value = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            }
             if(type==='boolean') input.checked=Boolean(value); else if(value!==null) input.value=value;
             wrapper.append(input); fieldBox.append(wrapper);
         });
