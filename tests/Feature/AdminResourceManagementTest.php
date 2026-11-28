@@ -115,4 +115,53 @@ class AdminResourceManagementTest extends TestCase
             'title' => 'تنبيه', 'message' => 'نص', 'severity' => 'info', 'source' => 'admin',
         ])->assertForbidden();
     }
+
+    public function test_admin_can_edit_and_remove_alerts_closures_and_unused_plans(): void
+    {
+        $this->actingAs(User::factory()->admin()->create());
+        $resources = [
+            'alerts' => [
+                ['title' => 'Demo alert', 'message' => 'Test alert only.', 'severity' => 'info', 'source' => 'admin'],
+                ['severity' => 'warning'],
+            ],
+            'road-closures' => [
+                ['title' => 'Demo closure', 'area_name' => 'Amman', 'status' => 'active', 'latitude' => 31.95, 'longitude' => 35.91],
+                ['status' => 'closed'],
+            ],
+            'subscription-plans' => [
+                ['name' => 'Demo plan', 'slug' => 'test-admin-plan', 'price' => 12, 'currency' => 'USD', 'interval' => 'month'],
+                ['name' => 'Renamed demo plan'],
+            ],
+        ];
+        foreach ($resources as $resource => [$create, $update]) {
+            $endpoint = '/api/admin/'.$resource;
+            $id = $this->postJson($endpoint, $create)->assertCreated()->json('data.id');
+            $this->getJson($endpoint.'/'.$id)->assertOk();
+            $result = $this->patchJson($endpoint.'/'.$id, $update)->assertOk();
+            foreach ($update as $key => $value) {
+                $result->assertJsonPath('data.'.$key, $value);
+            }
+            $this->deleteJson($endpoint.'/'.$id)->assertOk();
+            $this->getJson($endpoint.'/'.$id)->assertNotFound();
+        }
+    }
+
+    public function test_alerts_and_closures_keep_their_exact_deadlines_from_the_admin_form(): void
+    {
+        $end = now()->addHour()->utc()->startOfMinute();
+        $this->actingAs(User::factory()->admin()->create());
+        $alertId = $this->postJson('/api/admin/alerts', [
+            'title' => 'Timed demo alert', 'message' => 'Test fixture', 'severity' => 'info',
+            'source' => 'demo', 'expires_at' => $end->toIso8601String(), 'is_active' => true,
+        ])->assertCreated()->json('data.id');
+        $roadId = $this->postJson('/api/admin/road-closures', [
+            'title' => 'Timed demo road closure', 'area_name' => 'Amman', 'status' => 'active',
+            'latitude' => 31.95, 'longitude' => 35.91, 'ends_at' => $end->toIso8601String(),
+        ])->assertCreated()->json('data.id');
+
+        $this->assertTrue(\App\Models\Alert::findOrFail($alertId)->expires_at->equalTo($end));
+        $this->assertTrue(\App\Models\RoadClosure::findOrFail($roadId)->ends_at->equalTo($end));
+        $this->actingAs(User::factory()->citizen()->create())->get('/map')
+            ->assertSee('Timed demo alert')->assertSee('Timed demo road closure');
+    }
 }

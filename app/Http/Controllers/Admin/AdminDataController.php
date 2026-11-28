@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -96,7 +97,7 @@ class AdminDataController extends Controller
     public function store(Request $request, string $resource): JsonResponse
     {
         $this->authorizeMajraResource($resource, 'create');
-        $validated = $request->validate($this->rules($resource, true));
+        $validated = $this->normalizeDates($request->validate($this->rules($resource, true)));
         [$model] = self::CONFIG[$resource];
 
         if (in_array($resource, ['alerts', 'road-closures'], true)) {
@@ -125,7 +126,7 @@ class AdminDataController extends Controller
         [$model] = self::CONFIG[$resource];
         $item = $model::findOrFail($record);
         $this->authorizeMajraResource($resource, 'update', $item);
-        $validated = $request->validate($this->rules($resource, false));
+        $validated = $this->normalizeDates($request->validate($this->rules($resource, false)));
         $previousStatus = $resource === 'reports' ? $item->status : null;
         $previousFalseFlag = $resource === 'reports' ? (bool) $item->is_false_report : false;
         $nextStatus = $validated['status'] ?? $previousStatus;
@@ -291,6 +292,17 @@ class AdminDataController extends Controller
         }
 
         return null;
+    }
+
+    private function normalizeDates(array $validated): array
+    {
+        foreach (['starts_at', 'ends_at', 'published_at', 'expires_at'] as $field) {
+            if (isset($validated[$field])) {
+                $validated[$field] = Carbon::parse($validated[$field])->setTimezone(config('app.timezone'));
+            }
+        }
+
+        return $validated;
     }
 
     private function rules(string $resource, bool $creating): array
