@@ -47,11 +47,12 @@ class GeminiFloodAnalyzer
             $mime = $media->mime_type ?: 'image/jpeg';
             $response = Http::acceptJson()
                 ->withHeaders(['x-goog-api-key' => $apiKey, 'Api-Revision' => '2026-05-20'])
+                ->withOptions(['version' => 1.1])
                 ->connectTimeout(4)->timeout(12)
                 ->retry(2, 400, fn (\Exception $exception, PendingRequest $request) => $exception instanceof ConnectionException
                     || ($exception instanceof RequestException && $exception->response->serverError()))
                 ->post('https://generativelanguage.googleapis.com/v1beta/interactions', [
-                    'model' => config('services.gemini.model', 'gemini-3.8-flash'),
+                    'model' => config('services.gemini.model'),
                     'store' => false,
                     'input' => [
                         [

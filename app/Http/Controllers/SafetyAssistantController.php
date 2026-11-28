@@ -58,6 +58,7 @@ class SafetyAssistantController extends Controller
 
         try {
             $response = Http::withHeaders(['x-goog-api-key' => $key, 'Api-Revision' => '2026-05-20'])
+                ->withOptions(['version' => 1.1])
                 ->connectTimeout(2)->timeout(5)
                 ->post('https://generativelanguage.googleapis.com/v1beta/interactions', [
                     'model' => config('services.gemini.model'),
