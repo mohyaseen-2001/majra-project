@@ -7,7 +7,7 @@
         <div class="map-legend" aria-label="مفتاح الخريطة">
             <span><i class="legend-dot danger"></i> خطر مرتفع</span><span><i class="legend-dot caution"></i> تنبيه</span><span><i class="legend-dot closure"></i> إغلاق طريق</span><span class="map-count">{{ $reports->count() }} بلاغاً موثّقاً</span>
         </div>
-        <div class="map-data-strip"><article class="weather-card"><span class="weather-symbol">☂</span><div><small>طقس عمّان · <span id="weather-source">Open-Meteo</span></small><strong id="weather-main">جارٍ جلب آخر تحديث…</strong><span id="weather-extra">إذا تعذّر المصدر ستظهر آخر بيانات محفوظة.</span></div><button type="button" id="weather-refresh">تحديث</button></article><article class="hospital-card"><div><strong>مستشفيات قريبة</strong><small id="hospital-status" role="status" aria-live="polite">مصدر مفتوح من OpenStreetMap وقد تكون بياناته غير مكتملة.</small><small id="location-status" role="status" aria-live="polite"></small></div><button type="button" class="button button-small" id="hospitals-load">اعرض حول مركز الخريطة</button></article></div>
+        <div class="map-data-strip"><article class="weather-card"><span class="weather-symbol">☂</span><div><small>طقس عمّان · <span id="weather-source">Open-Meteo</span></small><strong id="weather-main">جارٍ جلب آخر تحديث…</strong><span id="weather-extra">إذا تعذّر المصدر ستظهر آخر بيانات محفوظة.</span></div><button type="button" id="weather-refresh">تحديث</button></article><article class="hospital-card"><div><strong>مستشفيات قريبة</strong><small id="hospital-status" role="status" aria-live="polite">مصدر مفتوح من OpenStreetMap وقد تكون بياناته غير مكتملة.</small><small id="location-status" role="status" aria-live="polite"></small><a id="hospital-fallback" class="text-link" href="https://www.google.com/maps/search/?api=1&amp;query=hospitals" target="_blank" rel="noopener noreferrer" hidden>ابحث عن المستشفيات في خرائط Google</a></div><button type="button" class="button button-small" id="hospitals-load">اعرض حول مركز الخريطة</button></article></div>
         <div id="majra-map" class="leaflet-map" aria-label="خريطة الأردن والبلاغات"></div>
         <div class="citizen-grid map-lower-grid">
             <section class="citizen-card"><div class="card-heading"><span class="card-icon">!</span><div><h2>التنبيهات الحالية</h2><p>المصدر والوقت ظاهرين مع كل تنبيه</p></div></div>
@@ -57,10 +57,14 @@
             const button=event.currentTarget; button.disabled=true; document.getElementById('hospital-status').textContent='جارٍ البحث حول مركز الخريطة…';
             const center=map.getCenter();
             try {
+                document.getElementById('hospital-fallback').hidden = true;
                 const {data}=await window.axios.get('/api/hospitals',{params:{latitude:center.lat,longitude:center.lng,radius_km:15}});
                 data.data.forEach((place)=>{const node=document.createElement('div');const name=document.createElement('strong');name.textContent=place.name;node.append(name);if(place.phone){const phone=document.createElement('div');phone.textContent=place.phone;node.append(phone);}L.marker([place.latitude,place.longitude]).addTo(map).bindPopup(node);});
                 document.getElementById('hospital-status').textContent=`${data.data.length} نتيجة · ${data.source} · ${data.stale?'بيانات محفوظة':'تحديث '+data.updated_at}`;
-            } catch { document.getElementById('hospital-status').textContent='تعذر جلب المستشفيات. راجع المصادر الرسمية عند الحاجة.'; }
+            } catch {
+                document.getElementById('hospital-status').textContent = 'تعذر جلب المستشفيات. راجع المصادر الرسمية عند الحاجة.';
+                document.getElementById('hospital-fallback').hidden = false;
+            }
             finally { button.disabled=false; }
         });
         if (navigator.geolocation) {
